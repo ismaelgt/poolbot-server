@@ -16,7 +16,7 @@ FILES_IGNORED_FOR_DELETION = [ "google_appengine" ]
 
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 REQUIREMENTS_FILE = os.path.join(PROJECT_DIR, "requirements.txt")
-TARGET_DIR = os.path.join(PROJECT_DIR, "sitepackages")
+TARGET_DIR = os.path.join(PROJECT_DIR, "src", "sitepackages")
 
 APPENGINE_TARGET_DIR = os.path.join(TARGET_DIR, "google_appengine")
 
