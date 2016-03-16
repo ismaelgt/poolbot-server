@@ -10,6 +10,18 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: core_match
+  properties:
+  - name: loser_id
+  - name: date
+    direction: desc
+
+- kind: core_match
+  properties:
+  - name: winner_id
+  - name: date
+    direction: desc
+
 - kind: cspreports_cspreport
   properties:
   - name: created
