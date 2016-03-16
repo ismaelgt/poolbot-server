@@ -7,7 +7,7 @@ threadsafe: true
 handlers:
 
 - url: /_ah/(mapreduce|queue|warmup|internalupload).*
-  script: core.wsgi.application
+  script: app.wsgi.application
   login: admin
   secure: always
 
@@ -17,12 +17,12 @@ handlers:
 
 # Set Django admin to be login:admin as well as Django's is_staff restriction
 - url: /admin.*
-  script: core.wsgi.application
+  script: app.wsgi.application
   secure: always
   login: admin
 
 - url: /.*
-  script: core.wsgi.application
+  script: app.wsgi.application
   secure: always
 
 skip_files:

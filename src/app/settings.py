@@ -1,5 +1,5 @@
 """
-Django settings for core project.
+Django settings for app project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
@@ -44,6 +44,9 @@ INSTALLED_APPS = (
     'djangae.contrib.gauth.datastore',
     'djangae.contrib.security',
     # 'djangae.contrib.uniquetool',
+    'api',
+    'core',
+    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -75,8 +78,8 @@ SECURE_CHECKS = [
     "djangosecure.check.djangosecure.check_sts",
     "djangosecure.check.djangosecure.check_frame_deny",
     "djangosecure.check.djangosecure.check_ssl_redirect",
-    "core.checks.check_session_csrf_enabled",
-    "core.checks.check_csp_is_not_report_only"
+    "app.checks.check_session_csrf_enabled",
+    "app.checks.check_csp_is_not_report_only"
 ]
 
 CSP_REPORT_URI = reverse_lazy('report_csp')
@@ -85,9 +88,9 @@ CSP_REPORTS_LOG_LEVEL = 'warning'
 CSP_REPORTS_SAVE = True
 CSP_REPORTS_EMAIL_ADMINS = False
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = 'app.urls'
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = 'app.wsgi.application'
 
 
 # Internationalization
