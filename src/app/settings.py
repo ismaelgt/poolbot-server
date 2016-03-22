@@ -44,9 +44,12 @@ INSTALLED_APPS = (
     'djangae.contrib.gauth.datastore',
     'djangae.contrib.security',
     # 'djangae.contrib.uniquetool',
+
     'api',
     'core',
+
     'rest_framework',
+    'rest_framework.authtoken',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -59,6 +62,18 @@ MIDDLEWARE_CLASSES = (
     'session_csrf.CsrfMiddleware',
     'djangosecure.middleware.SecurityMiddleware',
 )
+
+AUTH_USER_MODEL = 'djangae.GaeDatastoreUser'
+
+AUTHENTICATION_BACKENDS = (
+    'djangae.contrib.gauth.datastore.backends.AppEngineUserAPIBackend',
+)
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
