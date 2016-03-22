@@ -1,13 +1,14 @@
-from rest_framework import filters, viewsets
+from rest_framework import filters
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
 from core.models import Match
 
+from .base import TokenRequiredModelViewSet
 from ..serializers import MatchSerializer
 
 
-class MatchViewSet(viewsets.ModelViewSet):
+class MatchViewSet(TokenRequiredModelViewSet):
 
     serializer_class = MatchSerializer
     queryset = Match.objects.all()

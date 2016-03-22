@@ -1,4 +1,5 @@
-from rest_framework import filters, viewsets
+from rest_framework import filters
+
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
@@ -6,10 +7,11 @@ from django.db.models import Q
 
 from core.models import Player, Match
 
+from .base import TokenRequiredModelViewSet
 from ..serializers import PlayerSerializer
 
 
-class PlayerViewSet(viewsets.ModelViewSet):
+class PlayerViewSet(TokenRequiredModelViewSet):
 
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
