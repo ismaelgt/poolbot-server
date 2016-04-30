@@ -16,7 +16,7 @@ class PlayerViewSet(TokenRequiredModelViewSet):
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
     permissions = []
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
 
     @detail_route(methods=['get'])
     def form(self, request, pk=None):
