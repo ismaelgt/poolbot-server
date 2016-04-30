@@ -9,5 +9,10 @@ class Player(models.Model):
     name = models.CharField(max_length=100)
     joined = models.DateTimeField(default=timezone.now)
 
+    # denormalized counts which would be slow to fetch at runtime
+    # these are updated in the increment_player_counts signal handler
+    total_win_count = models.IntegerField(default=0, null=True)
+    total_loss_count = models.IntegerField(default=0, null=True)
+
     def __unicode__(self):
         return self.name

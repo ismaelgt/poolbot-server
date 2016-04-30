@@ -11,6 +11,8 @@ class PlayerSerializer(serializers.ModelSerializer):
             'slack_id',
             'name',
             'joined',
+            'total_win_count',
+            'total_loss_count',
         )
         read_only_fields = (
             'joined',
