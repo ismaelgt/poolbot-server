@@ -21,6 +21,11 @@ handlers:
   secure: always
   login: admin
 
+- url: /tasks.*
+  script: app.wsgi.application
+  login: admin
+  secure: always
+
 - url: /.*
   script: app.wsgi.application
   secure: always
