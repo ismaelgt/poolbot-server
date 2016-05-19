@@ -8,3 +8,5 @@ nose
 six
 djangorestframework
 django-filter
+factory-boy
+django-webtest
