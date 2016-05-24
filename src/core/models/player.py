@@ -11,8 +11,8 @@ class Player(models.Model):
 
     # denormalized counts which would be slow to fetch at runtime
     # these are updated in the increment_player_counts signal handler
-    total_win_count = models.IntegerField(default=0, null=True)
-    total_loss_count = models.IntegerField(default=0, null=True)
+    total_win_count = models.IntegerField(default=0)
+    total_loss_count = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
