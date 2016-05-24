@@ -17,6 +17,17 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: core_challenge
+  properties:
+  - name: initiator_id
+  - name: date
+
+- kind: core_challenge
+  properties:
+  - name: initiator_id
+  - name: date
+    direction: desc
+
 - kind: core_match
   properties:
   - name: loser_id

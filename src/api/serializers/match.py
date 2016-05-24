@@ -17,3 +17,4 @@ class MatchSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'date',
         )
+
