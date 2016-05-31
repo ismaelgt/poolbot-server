@@ -28,6 +28,11 @@ indexes:
   - name: date
     direction: desc
 
+- kind: core_challenge
+  properties:
+  - name: initiator_id
+  - name: last_modified
+
 - kind: core_match
   properties:
   - name: loser_id

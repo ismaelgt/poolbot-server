@@ -1,0 +1,5 @@
+cron:
+
+- description: reset challenger instances
+  url: /tasks/reset-challenges/
+  schedule: every 10 minutes

@@ -7,6 +7,11 @@ task_patterns = patterns("core.views",
         'resync_player_match_counts',
         name="resync_player_match_counts"
     ),
+    url(
+        '^reset-challenges/',
+        'reset_challenge_instances',
+        name="reset_challenge_instances"
+    ),
 )
 
 
