@@ -8,7 +8,7 @@ from django.db.models import Q
 from core.models import Player, Match
 
 from .base import TokenRequiredModelViewSet
-from ..serializers import PlayerSerializer
+from ..serializers import PlayerSerializer, PatchPlayerSerializer
 
 
 class PlayerViewSet(TokenRequiredModelViewSet):
@@ -17,6 +17,16 @@ class PlayerViewSet(TokenRequiredModelViewSet):
     queryset = Player.objects.all()
     permissions = []
     filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+
+    def get_serializer_class(self):
+        """Use a different serializer when handling PATCH requests, which
+        makes more fields read_only."""
+        serializer_class = self.serializer_class
+
+        if self.request.method == 'PATCH':
+            serializer_class = PatchPlayerSerializer
+
+        return serializer_class
 
     @detail_route(methods=['get'])
     def form(self, request, pk=None):
