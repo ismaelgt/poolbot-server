@@ -4,7 +4,5 @@ from rest_framework import viewsets
 
 
 class TokenRequiredModelViewSet(viewsets.ModelViewSet):
-    # authentication_classes = (TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
