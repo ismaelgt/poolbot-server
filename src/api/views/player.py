@@ -33,10 +33,13 @@ class PlayerViewSet(TokenRequiredModelViewSet):
         """Return the results of recent games involving the specified player."""
         user = self.get_object()
 
+        # we support a limit param which reduces the number of results
+        limit = request.query_params.get('limit', 10)
+
         # this might be pretty inefficent on the datastore...
         recent_games = Match.objects.filter(
             Q(winner=user) | Q(loser=user)
-        ).order_by('-date')
+        ).order_by('-date')[:limit]
 
         # parse the reslts into a easy to digest results string - like `W L L W`
         results = ' '.join([
