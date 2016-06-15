@@ -1,11 +1,12 @@
+from google.appengine.api import memcache
+
 from rest_framework import filters
 
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
-from django.db.models import Q
-
 from core.models import Player, Match
+from core.utils import format_matches_to_show_form, form_cache_key
 
 from .base import TokenRequiredModelViewSet
 from ..serializers import PlayerSerializer, PatchPlayerSerializer
@@ -33,18 +34,18 @@ class PlayerViewSet(TokenRequiredModelViewSet):
         """Return the results of recent games involving the specified player."""
         user = self.get_object()
 
+        # try and get the queryset of results from memcache
+        cache_key = form_cache_key(user)
+        queryset = memcache.get(cache_key)
+        if queryset is None:
+            # this might be pretty inefficent on the datastore...
+            queryset = Match.objects.matches_involving_player(user)
+            memcache.set(cache_key, queryset)
+
         # we support a limit param which reduces the number of results
-        limit = request.query_params.get('limit', 10)
+        limit = int(request.query_params.get('limit', 10))
+        limited_queryset = queryset[:limit]
 
-        # this might be pretty inefficent on the datastore...
-        recent_games = Match.objects.filter(
-            Q(winner=user) | Q(loser=user)
-        ).order_by('-date')[:limit]
+        form = format_matches_to_show_form(limited_queryset, user)
 
-        # parse the reslts into a easy to digest results string - like `W L L W`
-        results = ' '.join([
-            'W' if game.winner == user else 'L'
-            for game in recent_games
-        ])
-
-        return Response(results)
+        return Response(form)
