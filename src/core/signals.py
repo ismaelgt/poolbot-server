@@ -31,7 +31,7 @@ def increment_player_counts(sender, instance=None, created=False, **kwargs):
 
 
 @receiver(post_save, sender=Match)
-def increment_player_counts(sender, instance=None, created=False, **kwargs):
+def update_player_form(sender, instance=None, created=False, **kwargs):
     """Update the cached form querysets for two players in a match."""
     if created and instance:
         # wipe the cache incase we try and fetch before the deferred task runs
