@@ -23,9 +23,13 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 def increment_player_counts(sender, instance=None, created=False, **kwargs):
     """Increment the denormalized counts on the related player instances."""
     if created:
+        elos = utils.calculate_elo(instance.winner.elo, instance.loser.elo, 1)
+
+        instance.winner.elo = elos[0]
         instance.winner.total_win_count += 1
         instance.winner.save()
 
+        instance.winner.elo = elos[1]
         instance.loser.total_loss_count += 1
         instance.loser.save()
 

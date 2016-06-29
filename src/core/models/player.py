@@ -18,6 +18,7 @@ class Player(models.Model):
     # these are updated in the increment_player_counts signal handler
     total_win_count = models.IntegerField(default=0)
     total_loss_count = models.IntegerField(default=0)
+    elo = models.IntegerField(default=1000)
 
     def __unicode__(self):
         return self.name
