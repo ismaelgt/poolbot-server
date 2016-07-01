@@ -13,6 +13,7 @@ def recalculate_player_elo_ratings():
     these ratings"""
     # we need to make sure all players have an initial elo score as its a migration
     for player in Player.objects.all():
+        player.elo = 1000
         player.save()
 
     players = {}
