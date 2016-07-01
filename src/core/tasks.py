@@ -18,7 +18,7 @@ def recalculate_player_elo_ratings():
         winner_elo = players[match.winner.slack_id] or 1000
         loser_elo = players[match.loser.slack_id] or 1000
 
-        elos = utils.calculate_elo(match.winner, match.loser, 1)
+        elos = utils.calculate_elo(match.winner.elo, match.loser.elo, 1)
 
         players[match.winner.slack_id] = elos[0]
         players[match.loser.slack_id] = elos[1]
