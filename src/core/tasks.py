@@ -17,7 +17,7 @@ def recalculate_player_elo_ratings():
 
     players = {}
 
-    matches = Match.objects.all()
+    matches = Match.objects.all().order_by('date')
     for match in matches:
         elos = calculate_elo(match.winner.elo, match.loser.elo, 1)
         match.winner.elo = elos[0]
