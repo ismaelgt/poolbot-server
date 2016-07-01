@@ -7,6 +7,26 @@ from .models import (
 )
 from .utils import form_cache_key
 
+def recalculate_player_elo_ratings():
+    """Iterate over each match, calculate winner and loser elo rating, and save
+    these ratings"""
+
+    players = {}
+
+    matches = Match.objects.all()
+    for match in matches:
+        winner_elo = players[match.winner.slack_id] or 1000
+        loser_elo = players[match.loser.slack_id] or 1000
+
+        elos = utils.calculate_elo(match.winner, match.loser, 1)
+
+        players[match.winner.slack_id] = elos[0]
+        players[match.loser.slack_id] = elos[1]
+
+    for slack_id, elo in players.iteritems():
+        player = Player.objects.get(slack_id=slack_id)
+        player.elo = elo
+        player.save()
 
 def resync_player_match_counts():
     """Iterate over each player, count their win and loss count, then save this

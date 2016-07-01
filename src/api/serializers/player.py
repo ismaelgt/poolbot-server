@@ -16,11 +16,13 @@ class PlayerSerializer(serializers.ModelSerializer):
             'country',
             'total_win_count',
             'total_loss_count',
+            'elo',
         )
         read_only_fields = (
             'joined',
             'total_win_count',
             'total_loss_count',
+            'elo',
         )
 
 

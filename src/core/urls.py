@@ -12,6 +12,11 @@ task_patterns = patterns("core.views",
         'reset_challenge_instances',
         name="reset_challenge_instances"
     ),
+    url(
+        '^recalculate-elo/',
+        'recalculate_player_elo_ratings',
+        name="recalculate_player_elo_ratings"
+    ),
 )
 
 
