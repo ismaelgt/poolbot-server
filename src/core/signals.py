@@ -9,7 +9,7 @@ from rest_framework.authtoken.models import Token
 
 from .models import Match
 from .tasks import update_player_form_cache
-from .utils import form_cache_key
+from .utils import form_cache_key, calculate_elo
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -22,12 +22,12 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 def update_elo_ratings(sender, instance=None, created=False, **kwargs):
     """Update the ELO ratings on the related player instances."""
     if created:
-        elos = utils.calculate_elo(instance.winner.elo, instance.loser.elo, 1)
+        elos = calculate_elo(instance.winner.elo, instance.loser.elo, 1)
 
         instance.winner.elo = elos[0]
         instance.winner.save()
 
-        instance.winner.elo = elos[1]
+        instance.loser.elo = elos[1]
         instance.loser.save()
 
 @receiver(post_save, sender=Match)
