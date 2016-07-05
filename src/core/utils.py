@@ -26,8 +26,8 @@ def calculate_elo(a, b, result):
     a_s = escore(a)
     b_s = escore(b)
 
-    a_r = ratio(a_s, b_s);
-    b_r = ratio(b_s, a_s);
+    a_r = ratio(a_s, b_s)
+    b_r = ratio(b_s, a_s)
 
     a_n = .5 if result == 0 else 1 if result > 0 else 0
     b_n = .5 if result == 0 else 1 if result < 0 else 0
