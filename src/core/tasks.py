@@ -5,28 +5,27 @@ from .models import (
     Match,
     Player,
 )
-from .utils import form_cache_key
+from .utils import form_cache_key, calculate_elo
+
 
 def recalculate_player_elo_ratings():
     """Iterate over each match, calculate winner and loser elo rating, and save
     these ratings"""
+    # we need to make sure all players have an initial elo score as its a migration
+    for player in Player.objects.all():
+        player.elo = 1000
+        player.save()
 
     players = {}
 
-    matches = Match.objects.all()
+    matches = Match.objects.all().order_by('date')
     for match in matches:
-        winner_elo = players[match.winner.slack_id] or 1000
-        loser_elo = players[match.loser.slack_id] or 1000
+        elos = calculate_elo(match.winner.elo, match.loser.elo, 1)
+        match.winner.elo = elos[0]
+        match.winner.save()
 
-        elos = utils.calculate_elo(match.winner.elo, match.loser.elo, 1)
-
-        players[match.winner.slack_id] = elos[0]
-        players[match.loser.slack_id] = elos[1]
-
-    for slack_id, elo in players.iteritems():
-        player = Player.objects.get(slack_id=slack_id)
-        player.elo = elo
-        player.save()
+        match.loser.elo = elos[1]
+        match.loser.save()
 
 def resync_player_match_counts():
     """Iterate over each player, count their win and loss count, then save this

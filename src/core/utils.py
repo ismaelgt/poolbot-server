@@ -11,12 +11,14 @@ def form_cache_key(player):
     return "form_{slack_id}".format(slack_id=player.slack_id)
 
 def calculate_elo(a, b, result):
-    """Returns the two players elos as an array [a, b]. result is +1 for a victory, -1 for b victory, and 0 for draw."""
-    K = 32
-    E = 400
+    """Returns the two players elos as an array [a, b].
+    Result is +1 for a victory, -1 for b victory, and 0 for draw.
+    """
+    K = 32.0
+    E = 400.0
 
     def escore(elo):
-        return pow(10, elo / E)
+        return pow(10.0, elo / E)
 
     def ratio(a_, b_):
         return a_ / (a_ + b_)
@@ -31,6 +33,6 @@ def calculate_elo(a, b, result):
     b_n = .5 if result == 0 else 1 if result < 0 else 0
 
     return [
-        a + K * (a_n - a_r),
-        b + K * (b_n - b_r)
+        int(a + K * (a_n - a_r) + .5),
+        int(b + K * (b_n - b_r) + .5)
     ]
