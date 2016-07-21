@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'djangosecure',
     'csp',
     'cspreports',
+    'djangae.contrib.contenttypes',
     'djangae.contrib.gauth.datastore',
     'djangae.contrib.security',
     # 'djangae.contrib.uniquetool',
