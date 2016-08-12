@@ -18,6 +18,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
 
+
 @receiver(post_save, sender=Match)
 def update_elo_ratings(sender, instance=None, created=False, **kwargs):
     """Update the ELO ratings on the related player instances."""
@@ -29,6 +30,7 @@ def update_elo_ratings(sender, instance=None, created=False, **kwargs):
 
         instance.loser.elo = elos[1]
         instance.loser.save()
+
 
 @receiver(post_save, sender=Match)
 def increment_player_counts(sender, instance=None, created=False, **kwargs):
@@ -52,3 +54,15 @@ def update_player_form(sender, instance=None, created=False, **kwargs):
             memcache.delete(key)
 
         deferred.defer(update_player_form_cache, instance.pk)
+
+
+@receiver(post_save, sender=Match)
+def increment_granny_count(sender, instance=None, created=False, **kwargs):
+    """Increment the denormalized granny counts on the player instances."""
+    if created and instance.granny:
+        instance.winner.total_grannies_given_count += 1
+        instance.winner.save()
+
+        instance.loser.total_grannies_taken_count += 1
+        instance.loser.save()
+
