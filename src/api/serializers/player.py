@@ -16,14 +16,22 @@ class PlayerSerializer(serializers.ModelSerializer):
             'country',
             'total_win_count',
             'total_loss_count',
+            'total_match_count',
             'elo',
         )
         read_only_fields = (
             'joined',
             'total_win_count',
             'total_loss_count',
+            'total_match_count',
             'elo',
         )
+
+    total_match_count = serializers.SerializerMethodField()
+
+    def get_total_match_count(self, obj):
+        """Return the sum of the win and loss count."""
+        return obj.total_win_count + obj.total_loss_count
 
 
 class PatchPlayerSerializer(PlayerSerializer):
