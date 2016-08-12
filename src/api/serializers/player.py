@@ -17,6 +17,8 @@ class PlayerSerializer(serializers.ModelSerializer):
             'total_win_count',
             'total_loss_count',
             'total_match_count',
+            'total_grannies_given_count',
+            'total_grannies_taken_count',
             'elo',
             'active',
         )
@@ -25,6 +27,8 @@ class PlayerSerializer(serializers.ModelSerializer):
             'total_win_count',
             'total_loss_count',
             'total_match_count',
+            'total_grannies_given_count',
+            'total_grannies_taken_count',
             'elo',
             'active',
         )

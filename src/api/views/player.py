@@ -9,7 +9,7 @@ from core.models import Player, Match
 from core.utils import format_matches_to_show_form, form_cache_key
 
 from .base import TokenRequiredModelViewSet
-from ..serializers import PlayerSerializer, PatchPlayerSerializer
+from ..serializers import MatchSerializer, PlayerSerializer, PatchPlayerSerializer
 
 
 class PlayerViewSet(TokenRequiredModelViewSet):
@@ -18,7 +18,7 @@ class PlayerViewSet(TokenRequiredModelViewSet):
     queryset = Player.objects.all()
     permissions = []
     filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
-    filter_fields = ('active',)
+    filter_fields = ('active', 'total_grannies_given_count')
 
     def get_serializer_class(self):
         """Use a different serializer when handling PATCH requests, which

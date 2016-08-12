@@ -18,6 +18,8 @@ class Player(models.Model):
     # these are updated in the increment_player_counts signal handler
     total_win_count = models.IntegerField(default=0)
     total_loss_count = models.IntegerField(default=0)
+    total_grannies_given_count = models.IntegerField(default=0)
+    total_grannies_taken_count = models.IntegerField(default=0)
 
     # this is updated in the update_elo_ratings signal handler
     elo = models.IntegerField(default=1000)
