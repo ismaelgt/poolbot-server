@@ -17,6 +17,11 @@ task_patterns = patterns("core.views",
         'recalculate_player_elo_ratings',
         name="recalculate_player_elo_ratings"
     ),
+    url(
+        '^set-active-flag/',
+        'set_active_player_flag',
+        name="set_active_player_flag"
+    ),
 )
 
 

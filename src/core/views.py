@@ -22,9 +22,16 @@ def reset_challenge_instances(request):
     deferred.defer(tasks.reset_challenges)
     return HttpResponse('Ok')
 
+
 def recalculate_player_elo_ratings(request):
     """Iterate over each match, calculate winner and loser elo rating, and save
     these ratings
     """
     deferred.defer(tasks.recalculate_player_elo_ratings)
+    return HttpResponse('Ok')
+
+
+def set_active_player_flag(request):
+    """Set a default for the new `active` player field."""
+    deferred.defer(tasks.add_active_player_flag)
     return HttpResponse('Ok')

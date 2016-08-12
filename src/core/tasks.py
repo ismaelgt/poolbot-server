@@ -39,6 +39,13 @@ def resync_player_match_counts():
         player.save()
 
 
+def add_active_player_flag():
+    """Iterate over each player and set their active flag to True."""
+    for player in Player.objects.all():
+        player.active = True
+        player.save()
+
+
 def reset_challenges():
     """Set the initiator and challenge attributes to None on all challenge
     instances which have an initiator but were last modified more than fifteen
