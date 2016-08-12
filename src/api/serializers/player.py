@@ -18,6 +18,7 @@ class PlayerSerializer(serializers.ModelSerializer):
             'total_loss_count',
             'total_match_count',
             'elo',
+            'active',
         )
         read_only_fields = (
             'joined',
@@ -25,6 +26,7 @@ class PlayerSerializer(serializers.ModelSerializer):
             'total_loss_count',
             'total_match_count',
             'elo',
+            'active',
         )
 
     total_match_count = serializers.SerializerMethodField()

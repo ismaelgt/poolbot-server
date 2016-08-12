@@ -22,5 +22,7 @@ class Player(models.Model):
     # this is updated in the update_elo_ratings signal handler
     elo = models.IntegerField(default=1000)
 
+    active = models.BooleanField(default=True)
+
     def __unicode__(self):
         return self.name

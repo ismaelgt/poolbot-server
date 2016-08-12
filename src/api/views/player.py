@@ -18,6 +18,7 @@ class PlayerViewSet(TokenRequiredModelViewSet):
     queryset = Player.objects.all()
     permissions = []
     filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    filter_fields = ('active',)
 
     def get_serializer_class(self):
         """Use a different serializer when handling PATCH requests, which

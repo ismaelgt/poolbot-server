@@ -45,6 +45,12 @@ indexes:
   - name: date
     direction: desc
 
+- kind: core_player
+  properties:
+  - name: active
+  - name: elo
+    direction: desc
+
 - kind: cspreports_cspreport
   properties:
   - name: created
