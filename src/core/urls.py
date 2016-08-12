@@ -22,6 +22,11 @@ task_patterns = patterns("core.views",
         'set_active_player_flag',
         name="set_active_player_flag"
     ),
+    url(
+        '^resync-player-granny-count/',
+        'resync_player_granny_counts',
+        name="resync_player_granny_count"
+    ),
 )
 
 

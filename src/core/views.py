@@ -13,6 +13,12 @@ def resync_player_match_counts(request):
     return HttpResponse('Ok')
 
 
+def resync_player_granny_counts(request):
+    """Recount all the grannies each player has given / taken."""
+    deferred.defer(tasks.resync_player_granny_counts)
+    return HttpResponse('Ok')
+
+
 def reset_challenge_instances(request):
     """Find all challenger instances which have an initiator or challenger
     set, which were last updated more than ten minutes ago, and set these

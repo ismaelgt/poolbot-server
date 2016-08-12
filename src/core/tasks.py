@@ -39,6 +39,21 @@ def resync_player_match_counts():
         player.save()
 
 
+def resync_player_granny_counts():
+    """Iterate over each player and store the grannies they have given/taken."""
+    players = Player.objects.all()
+    for player in players:
+        player.total_grannies_given_count = Match.objects.filter(
+            winner=player,
+            granny=True
+        ).count()
+        player.total_grannies_taken_count = Match.objects.filter(
+            loser=player,
+            granny=True
+        ).count()
+        player.save()
+
+
 def add_active_player_flag():
     """Iterate over each player and set their active flag to True."""
     for player in Player.objects.all():
