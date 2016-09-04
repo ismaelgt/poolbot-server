@@ -27,6 +27,11 @@ task_patterns = patterns("core.views",
         'resync_player_granny_counts',
         name="resync_player_granny_count"
     ),
+    url(
+        '^set-active-season/',
+        'set_active_season',
+        name="set_active_season"
+    ),
 )
 
 

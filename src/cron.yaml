@@ -3,3 +3,7 @@ cron:
 - description: reset challenger instances
   url: /tasks/reset-challenges/
   schedule: every 10 minutes
+
+- description: set active season
+  url: /tasks/set-active-season/
+  schedule: every day 00:00

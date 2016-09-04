@@ -79,3 +79,30 @@ def update_player_form_cache(match_pk):
         cache_key = form_cache_key(player)
         queryset = Match.objects.matches_involving_player(player)
         memcache.set(cache_key, queryset)
+def set_active_season():
+    """Make sure the correct season is set as `active`."""
+    today = timezone.now().date()
+
+    try:
+        season = Season.objects.get(active=True)
+    except Season.DoesNotExist:
+        season = None
+    else:
+        # lets check the current active season hasn't expired
+        if season.end_date < today:
+            season.deactivate()
+            season = None
+
+    # if season is None we try to activate the new season
+    if season is None:
+        try:
+            new_season = Season.objects.get(start_date=today)
+        except Season.DoesNotExist:
+            # now we have a problem.... there is season to activate
+            # so we log a message for the administator
+            logging.error('No season set for {}'.format(today))
+        else:
+            # this sets the active=True flag and resets all
+            # denormalized season fields on the player objects
+            new_season.activate()
+
