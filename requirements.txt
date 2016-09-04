@@ -10,3 +10,4 @@ djangorestframework
 django-filter
 factory-boy
 django-webtest
+mock
