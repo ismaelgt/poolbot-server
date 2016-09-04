@@ -28,6 +28,11 @@ task_patterns = patterns("core.views",
         name="resync_player_granny_count"
     ),
     url(
+        '^migrate-season-fields/',
+        'season_migration',
+        name="season_migration"
+    ),
+    url(
         '^set-active-season/',
         'set_active_season',
         name="set_active_season"

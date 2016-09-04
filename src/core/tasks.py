@@ -1,9 +1,17 @@
+import logging
+from datetime import timedelta
+
+from django.utils import timezone
+
+from djangae.db.transaction import atomic
+
 from google.appengine.api import memcache
 
 from .models import (
     Challenge,
     Match,
     Player,
+    Season,
 )
 from .utils import form_cache_key, calculate_elo
 
@@ -13,18 +21,18 @@ def recalculate_player_elo_ratings():
     these ratings"""
     # we need to make sure all players have an initial elo score as its a migration
     for player in Player.objects.all():
-        player.elo = 1000
+        player.total_elo = 1000
         player.save()
 
     players = {}
 
     matches = Match.objects.all().order_by('date')
     for match in matches:
-        elos = calculate_elo(match.winner.elo, match.loser.elo, 1)
-        match.winner.elo = elos[0]
+        elos = calculate_elo(match.winner.total_elo, match.loser.total_elo, 1)
+        match.winner.total_elo = elos[0]
         match.winner.save()
 
-        match.loser.elo = elos[1]
+        match.loser.total_elo = elos[1]
         match.loser.save()
 
 def resync_player_match_counts():
@@ -79,6 +87,36 @@ def update_player_form_cache(match_pk):
         cache_key = form_cache_key(player)
         queryset = Match.objects.matches_involving_player(player)
         memcache.set(cache_key, queryset)
+
+
+def season_migration():
+    """
+    Migration for the introduction of season related fields.
+
+    This allows for retrospecitve assoication between games, elo
+    points and a new season instance.
+    """
+    first_match = Match.objects.all().order_by('date').first()
+    season = Season.objects.create(
+        start_date=first_match.date.date(),
+        end_date=timezone.now().date() + timedelta(days=7),
+        active=True
+    )
+
+    for match in Match.objects.all():
+        match.season = season
+        match.save()
+
+    for player in Player.objects.all():
+        player.total_elo = player.elo
+        player.season_elo = player.elo
+        player.season_win_count = player.total_win_count
+        player.season_loss_count = player.total_loss_count
+        player.season_grannies_given_count = player.total_grannies_given_count
+        player.season_grannies_taken_count = player.total_grannies_taken_count
+        player.save()
+
+
 def set_active_season():
     """Make sure the correct season is set as `active`."""
     today = timezone.now().date()
