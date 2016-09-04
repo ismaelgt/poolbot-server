@@ -17,7 +17,7 @@ class MatchViewSet(TokenRequiredModelViewSet):
     queryset = Match.objects.all()
     permissions = []
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('winner', 'loser')
+    filter_fields = ('winner', 'loser' , 'season')
 
     @list_route(methods=['get'])
     def head_to_head(self, request, pk=None):

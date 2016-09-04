@@ -14,17 +14,36 @@ class Player(models.Model):
     nickname = models.CharField(max_length=100, blank=True, null=True)
     country = models.CharField(max_length=100, blank=True, null=True)
 
+    # TODO remove after we've run the season migration
+    elo = models.IntegerField(default=1000)
+
     # denormalized counts which would be slow to fetch at runtime
-    # these are updated in the increment_player_counts signal handler
+    # these are updated in the post_save signal handler
+    total_elo = models.IntegerField(default=1000)
     total_win_count = models.IntegerField(default=0)
     total_loss_count = models.IntegerField(default=0)
     total_grannies_given_count = models.IntegerField(default=0)
     total_grannies_taken_count = models.IntegerField(default=0)
 
-    # this is updated in the update_elo_ratings signal handler
-    elo = models.IntegerField(default=1000)
+    season_elo = models.IntegerField(default=1000)
+    season_win_count = models.IntegerField(default=0)
+    season_loss_count = models.IntegerField(default=0)
+    season_grannies_given_count = models.IntegerField(default=0)
+    season_grannies_taken_count = models.IntegerField(default=0)
 
     active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
+
+    def reset_season_fields(self, commit=True):
+        """Reset all related fields."""
+        self.season_elo = 1000
+        self.season_win_count = 0
+        self.season_loss_count = 0
+        self.season_grannies_given_count = 0
+        self.season_grannies_taken_count = 0
+
+        if commit:
+            self.save()
+

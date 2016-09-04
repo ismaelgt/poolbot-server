@@ -66,7 +66,11 @@ class PlayerViewSet(TokenRequiredModelViewSet):
 
     @list_route(methods=['get'])
     def elo(self, request, pk=None):
-        """Return the points that can be won/lost between two players."""
+        """
+        Return the points that can be won/lost between two players.
+
+        This is always season specific.
+        """
         player1 = request.query_params.get('player1')
         player2 = request.query_params.get('player2')
 
@@ -76,17 +80,17 @@ class PlayerViewSet(TokenRequiredModelViewSet):
         player1_details = Player.objects.get(slack_id=player1)
         player2_details = Player.objects.get(slack_id=player2)
 
-        result1 = calculate_elo(player1_details.elo, player2_details.elo, 1)
-        result2 = calculate_elo(player2_details.elo, player1_details.elo, 1)
+        result1 = calculate_elo(player1_details.season_elo, player2_details.season_elo, 1)
+        result2 = calculate_elo(player2_details.season_elo, player1_details.season_elo, 1)
 
         def _generate_results(player_details, elo_win, elo_lose):
             return {
                 'slack_id': player_details.slack_id,
-                'elo': player_details.elo,
+                'season_elo': player_details.season_elo,
                 'elo_win': elo_win,
                 'elo_lose': elo_lose,
-                'points_win': elo_win - player_details.elo,
-                'points_lose': player_details.elo - elo_lose,
+                'points_win': elo_win - player_details.season_elo,
+                'points_lose': player_details.season_elo - elo_lose,
             }
 
         results = [

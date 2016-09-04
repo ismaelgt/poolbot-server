@@ -9,6 +9,7 @@ class MatchSerializer(serializers.ModelSerializer):
         model = Match
         fields = (
             'date',
+            'season',
             'winner',
             'loser',
             'channel',
