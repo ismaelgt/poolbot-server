@@ -68,6 +68,18 @@ indexes:
 - kind: core_player
   properties:
   - name: active
+  - name: season_elo
+    direction: desc
+
+- kind: core_player
+  properties:
+  - name: active
+  - name: total_elo
+    direction: desc
+
+- kind: core_player
+  properties:
+  - name: active
   - name: total_grannies_given_count
     direction: desc
 
