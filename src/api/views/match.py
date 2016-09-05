@@ -5,7 +5,7 @@ from rest_framework import filters
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
-from core.models import Match
+from core.models import Match, Season
 
 from .base import TokenRequiredModelViewSet
 from ..serializers import MatchSerializer
@@ -17,7 +17,15 @@ class MatchViewSet(TokenRequiredModelViewSet):
     queryset = Match.objects.all()
     permissions = []
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('winner', 'loser')
+    filter_fields = ('winner', 'loser' , 'season')
+
+    def perform_create(self, serializer):
+        """
+        To avoid the client always knowing the active season
+        we find it and inject it here.
+        """
+        active_season = Season.objects.get(active=True)
+        serializer.save(season=active_season)
 
     @list_route(methods=['get'])
     def head_to_head(self, request, pk=None):

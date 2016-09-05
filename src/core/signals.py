@@ -23,13 +23,20 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 def update_elo_ratings(sender, instance=None, created=False, **kwargs):
     """Update the ELO ratings on the related player instances."""
     if created:
-        elos = calculate_elo(instance.winner.elo, instance.loser.elo, 1)
+        total_elos = calculate_elo(instance.winner.total_elo, instance.loser.total_elo, 1)
+        season_elos = calculate_elo(instance.winner.season_elo, instance.loser.season_elo, 1)
 
-        instance.winner.elo = elos[0]
+        instance.winner.total_elo = total_elos[0]
+        instance.winner.season_elo = season_elos[0]
         instance.winner.save()
 
-        instance.loser.elo = elos[1]
+        instance.loser.total_elo = total_elos[1]
+        instance.loser.season_elo = season_elos[1]
         instance.loser.save()
+
+        # with the update elo scores we update the season top five
+        # we do this here rather than a seperate listener as order is not gaurenteed
+        instance.season.set_top_five_players(commit=True)
 
 
 @receiver(post_save, sender=Match)
@@ -37,9 +44,11 @@ def increment_player_counts(sender, instance=None, created=False, **kwargs):
     """Increment the denormalized counts on the related player instances."""
     if created:
         instance.winner.total_win_count += 1
+        instance.winner.season_win_count += 1
         instance.winner.save()
 
         instance.loser.total_loss_count += 1
+        instance.loser.season_loss_count += 1
         instance.loser.save()
 
 
@@ -61,8 +70,9 @@ def increment_granny_count(sender, instance=None, created=False, **kwargs):
     """Increment the denormalized granny counts on the player instances."""
     if created and instance.granny:
         instance.winner.total_grannies_given_count += 1
+        instance.winner.season_grannies_given_count += 1
         instance.winner.save()
 
         instance.loser.total_grannies_taken_count += 1
+        instance.loser.season_grannies_taken_count += 1
         instance.loser.save()
-
