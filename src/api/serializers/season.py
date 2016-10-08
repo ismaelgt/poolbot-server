@@ -5,27 +5,22 @@ from core.models import Season
 
 class SeasonSerializer(serializers.ModelSerializer):
 
+    start_date = serializers.DateField(format="%d %b %Y")
+    end_date = serializers.DateField(format="%d %b %Y")
+
     class Meta:
         model = Season
         fields = (
+            'pk',
+            'name',
             'start_date',
             'end_date',
             'active',
-
-            'first_place',
-            'second_place',
-            'third_place',
-            'forth_place',
-            'fifth_place'
         )
         read_only_fields = (
+            'pk',
+            'name',
             'start_date',
             'end_date',
             'active',
-
-            'first_place',
-            'second_place',
-            'third_place',
-            'forth_place',
-            'fifth_place'
         )

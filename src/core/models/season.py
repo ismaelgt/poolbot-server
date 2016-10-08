@@ -8,15 +8,10 @@ from player import Player
 class Season(models.Model):
     """Defines a duration of time during which players play pool matches."""
 
+    name = models.CharField(max_length=100, unique=True)
     start_date = models.DateField()
     end_date = models.DateField()
     active = models.BooleanField(default=False)
-
-    first_place = models.ForeignKey('core.Player', blank=True, null=True, related_name='+')
-    second_place = models.ForeignKey('core.Player', blank=True, null=True, related_name='+')
-    third_place = models.ForeignKey('core.Player', blank=True, null=True, related_name='+')
-    forth_place = models.ForeignKey('core.Player', blank=True, null=True, related_name='+')
-    fifth_place = models.ForeignKey('core.Player', blank=True, null=True, related_name='+')
 
     def clean(self):
         """Perform some field level validation on the two date fields."""
@@ -54,32 +49,7 @@ class Season(models.Model):
 
     def deactivate(self, commit=True):
         """Mark the instance as inactive and make sure the top five are set."""
-        self.set_top_five_players(commit=False)
         self.active = False
-
-        if commit:
-            self.save()
-
-    def set_top_five_players(self, commit=True):
-        """
-        Based on their elo points, get the top five from the leaderboard. To
-        try and prevent this using the wrong seasons denormalized scores, the
-        season must be active at the time this is called.
-        """
-        if not self.active:
-            # TODO have a fallback that does not rely on the denormalized counts
-            raise Exception('Cannot set top five if season not active.')
-
-        top_five = Player.objects.filter(active=True).order_by('-season_elo')[:5]
-        top_five_fields = [
-            'first_place',
-            'second_place',
-            'third_place',
-            'forth_place',
-            'fifth_place',
-        ]
-        for player, field in zip(top_five, top_five_fields):
-            setattr(self, field, player)
 
         if commit:
             self.save()
