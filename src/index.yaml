@@ -55,6 +55,11 @@ indexes:
 
 - kind: core_match
   properties:
+  - name: season_id
+  - name: date
+
+- kind: core_match
+  properties:
   - name: winner_id
   - name: date
     direction: desc
@@ -82,6 +87,11 @@ indexes:
   - name: active
   - name: total_grannies_given_count
     direction: desc
+
+- kind: core_seasonplayer
+  properties:
+  - name: season_id
+  - name: elo_score
 
 - kind: cspreports_cspreport
   properties:
