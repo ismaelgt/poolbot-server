@@ -6,10 +6,8 @@ from django.utils import timezone
 
 from djangae.test import TestCase
 
-from core.models import Match, Season
 from core.models import Match, Season, EloHistory
 from core.tests.factories import MatchFactory, SeasonFactory, PlayerFactory
-from core.tasks import set_active_season
 from core.tasks import set_active_season, elo_history_migration
 from core.utils import calculate_elo
 

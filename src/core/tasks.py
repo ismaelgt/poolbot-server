@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 from datetime import timedelta
 
 from django.utils import timezone
@@ -9,10 +10,12 @@ from google.appengine.api import memcache
 
 from .models import (
     Challenge,
+    EloHistory,
     Match,
     Player,
     Season,
 )
+
 from .utils import form_cache_key, calculate_elo
 
 
