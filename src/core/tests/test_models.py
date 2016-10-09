@@ -99,24 +99,9 @@ class SeasonModelTestCase(TestCase):
         season = SeasonFactory(active=True)
         self.assertTrue(season.active)
 
-        player_1 = PlayerFactory(season_elo=5000, active=True)
-        player_2 = PlayerFactory(season_elo=4000, active=True)
-        player_3 = PlayerFactory(season_elo=3000, active=True)
-        player_4 = PlayerFactory(season_elo=2000, active=True)
-        player_5 = PlayerFactory(season_elo=1000, active=True)
-
-        # should not be included as they are inactive and have too low score
-        player_6 = PlayerFactory(season_elo=6000, active=False)
-        player_7 = PlayerFactory(season_elo=500, active=True)
-
         season.deactivate()
 
         season.refresh_from_db()
         self.assertFalse(season.active)
 
-        # the top five players should also be set
-        self.assertEqual(season.first_place, player_1)
-        self.assertEqual(season.second_place, player_2)
-        self.assertEqual(season.third_place, player_3)
-        self.assertEqual(season.forth_place, player_4)
-        self.assertEqual(season.fifth_place, player_5)
+
