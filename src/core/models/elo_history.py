@@ -19,6 +19,6 @@ class EloHistory(models.Model):
     def __unicode__(self):
         return "{player} had {elo} points on {date}".format(
             player=self.player,
-            elo=self.elo,
+            elo=self.elo_score,
             date=self.date
         )
