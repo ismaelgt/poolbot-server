@@ -59,3 +59,9 @@ def elo_history_migration(request):
     """Retrospectively generate Elo History instances."""
     deferred.defer(tasks.elo_history_migration)
     return HttpResponse('Ok')
+
+
+def season_player_migration(request):
+    """Retrospectively generate Season Player instances."""
+    deferred.defer(tasks.season_player_migration)
+    return HttpResponse('Ok')

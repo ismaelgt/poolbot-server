@@ -33,6 +33,35 @@ indexes:
   - name: initiator_id
   - name: last_modified
 
+- kind: core_elohistory
+  properties:
+  - name: player_id
+  - name: __key__
+    direction: desc
+
+- kind: core_elohistory
+  properties:
+  - name: player_id
+  - name: date
+
+- kind: core_elohistory
+  properties:
+  - name: player_id
+  - name: date
+    direction: desc
+
+- kind: core_elohistory
+  properties:
+  - name: player_id
+  - name: season_id
+  - name: date
+    direction: desc
+
+- kind: core_elohistory
+  properties:
+  - name: season_id
+  - name: player_id
+
 - kind: core_match
   properties:
   - name: granny
@@ -86,6 +115,11 @@ indexes:
   properties:
   - name: active
   - name: total_grannies_given_count
+    direction: desc
+
+- kind: core_season
+  properties:
+  - name: __key__
     direction: desc
 
 - kind: core_seasonplayer

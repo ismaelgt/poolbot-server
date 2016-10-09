@@ -14,6 +14,7 @@ from .models import (
     Match,
     Player,
     Season,
+    SeasonPlayer,
 )
 
 from .utils import form_cache_key, calculate_elo
@@ -171,3 +172,26 @@ def elo_history_migration():
             # update the elo dictionary values
             player_season_elos[match.winner.pk] = winner_season_elo
             player_season_elos[match.loser.pk] = loser_season_elo
+
+
+def season_player_migration():
+    """Retrospectively generate all Season Player instances."""
+    seasons = Season.objects.all().order_by('start_date')
+    for season in seasons:
+        # get all players from the season
+        player_pks = EloHistory.objects.filter(season=season).values_list('player', flat=True).distinct()
+
+        for player_pk in player_pks:
+            # get the last elo history instance for x player in y season
+            last_elo_history = EloHistory.objects.filter(season=season, player_id=player_pk).order_by('date').last()
+            # next get the players win and loss count
+            win_count = Match.objects.filter(season=season, winner_id=player_pk).count()
+            loss_count = Match.objects.filter(season=season, loser_id=player_pk).count()
+            # create the new season player instance
+            SeasonPlayer.objects.create(
+                player_id=player_pk,
+                season=season,
+                elo_score=last_elo_history.elo_score,
+                win_count=win_count,
+                loss_count=loss_count
+            )
