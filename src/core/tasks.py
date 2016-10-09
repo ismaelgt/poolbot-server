@@ -144,3 +144,27 @@ def set_active_season():
             # denormalized season fields on the player objects
             new_season.activate()
 
+def elo_history_migration():
+    """Retrospectively generate all Elo History instances."""
+
+    seasons = Season.objects.all().order_by('start_date')
+    for season in seasons:
+        player_season_elos = defaultdict(lambda: 1000)
+        for match in Match.objects.filter(season=season).order_by('date'):
+
+            winner_season_elo = player_season_elos[match.winner.pk]
+            loser_season_elo = player_season_elos[match.loser.pk]
+            winner_season_elo, loser_season_elo = calculate_elo(winner_season_elo, loser_season_elo)
+
+            # finally create an elo instance to track history of score
+            common_fields = {
+                'match': match,
+                'season': match.season,
+                'date': match.date,
+            }
+            EloHistory.objects.create(player=match.winner, elo_score=winner_season_elo, **common_fields)
+            EloHistory.objects.create(player=match.loser, elo_score=loser_season_elo, **common_fields)
+
+            # update the elo dictionary values
+            player_season_elos[match.winner.pk] = winner_season_elo
+            player_season_elos[match.loser.pk] = loser_season_elo

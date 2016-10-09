@@ -37,6 +37,11 @@ task_patterns = patterns("core.views",
         'set_active_season',
         name="set_active_season"
     ),
+    url(
+        '^migrate-elo-history',
+        'elo_history_migration',
+        name='elo_history_migration'
+    )
 )
 
 

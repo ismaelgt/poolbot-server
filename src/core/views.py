@@ -53,3 +53,9 @@ def set_active_season(request):
     """Mark the correct season as active."""
     deferred.defer(tasks.set_active_season)
     return HttpResponse('Ok')
+
+
+def elo_history_migration(request):
+    """Retrospectively generate Elo History instances."""
+    deferred.defer(tasks.elo_history_migration)
+    return HttpResponse('Ok')

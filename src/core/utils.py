@@ -10,7 +10,7 @@ def form_cache_key(player):
     """Return the cache key for the per player form cache."""
     return "form_{slack_id}".format(slack_id=player.slack_id)
 
-def calculate_elo(a, b, result):
+def calculate_elo(a, b, result=1):
     """Returns the two players elos as an array [a, b].
     Result is +1 for a victory, -1 for b victory, and 0 for draw.
     """
