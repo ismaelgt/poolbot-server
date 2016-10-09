@@ -47,3 +47,32 @@ class Player(models.Model):
         if commit:
             self.save()
 
+    def increment_win_counts(self, commit=True):
+        """Increment denormalized win counts."""
+        self.total_win_count += 1
+        self.season_win_count += 1
+        if commit:
+            self.save()
+
+    def increment_loss_counts(self, commit=True):
+        """Increment denormalized loss counts."""
+        self.total_loss_count += 1
+        self.season_loss_count += 1
+        if commit:
+            self.save()
+
+    def increment_grannies_given_counts(self, commit=True):
+        self.total_grannies_given_count += 1
+        self.season_grannies_given_count += 1
+        if commit:
+            self.save()
+
+    def increment_grannies_taken_counts(self, commit=True):
+        self.total_grannies_taken_count += 1
+        self.season_grannies_taken_count += 1
+        if commit:
+            self.save()
+
+
+
+

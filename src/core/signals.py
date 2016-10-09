@@ -7,7 +7,7 @@ from django.dispatch import receiver
 
 from rest_framework.authtoken.models import Token
 
-from .models import Match
+from .models import Match, SeasonPlayer, EloHistory
 from .tasks import update_player_form_cache
 from .utils import form_cache_key, calculate_elo
 
@@ -20,36 +20,39 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 
 @receiver(post_save, sender=Match)
-def update_elo_ratings(sender, instance=None, created=False, **kwargs):
-    """Update the ELO ratings on the related player instances."""
+def update_denormalized_player_fields(sender, instance=None, created=False, **kwargs):
+    """Update the ELO ratings and win/loss counts on the related player instances."""
     if created:
-        total_elos = calculate_elo(instance.winner.total_elo, instance.loser.total_elo, 1)
-        season_elos = calculate_elo(instance.winner.season_elo, instance.loser.season_elo, 1)
+        winner_total_elo, loser_total_elo = calculate_elo(instance.winner.total_elo, instance.loser.total_elo, 1)
+        winner_season_elo, loser_season_elo = calculate_elo(instance.winner.season_elo, instance.loser.season_elo, 1)
 
-        instance.winner.total_elo = total_elos[0]
-        instance.winner.season_elo = season_elos[0]
-        instance.winner.save()
+        # update all denormalized fields on the winner
+        winner = instance.winner
+        winner.total_elo = winner_total_elo
+        winner.season_elo = winner_season_elo
+        winner.increment_win_counts(commit=False)
+        if instance.granny:
+            winner.increment_grannies_given_counts(commit=False)
+        winner.save()
 
-        instance.loser.total_elo = total_elos[1]
-        instance.loser.season_elo = season_elos[1]
-        instance.loser.save()
+        # update all denormalized fields on the loser
+        loser = instance.loser
+        loser.total_elo = loser_total_elo
+        loser.season_elo = loser_season_elo
+        loser.increment_loss_counts(commit=False)
+        if instance.granny:
+            loser.increment_grannies_taken_counts(commit=False)
+        loser.save()
 
-        # with the update elo scores we update the season top five
-        # we do this here rather than a seperate listener as order is not gaurenteed
-        instance.season.set_top_five_players(commit=True)
+        # defer denormalization onto season player - this is safe
+        # to defer as the serialized response from the API after
+        # recording a game does not embed any data from this model
+        deferred.defer(SeasonPlayer.objects.update_active, player=winner, elo=winner_season_elo, wins=winner.season_win_count, losses=winner.season_loss_count)
+        deferred.defer(SeasonPlayer.objects.update_active, player=loser, elo=loser_season_elo, wins=loser.season_win_count, losses=loser.season_loss_count)
 
-
-@receiver(post_save, sender=Match)
-def increment_player_counts(sender, instance=None, created=False, **kwargs):
-    """Increment the denormalized counts on the related player instances."""
-    if created:
-        instance.winner.total_win_count += 1
-        instance.winner.season_win_count += 1
-        instance.winner.save()
-
-        instance.loser.total_loss_count += 1
-        instance.loser.season_loss_count += 1
-        instance.loser.save()
+        # finally create an elo instance to track history of score
+        EloHistory.objects.create(player=winner, match=instance, season=instance.season, elo_score=winner_season_elo)
+        EloHistory.objects.create(player=loser, match=instance, season=instance.season, elo_score=loser_season_elo)
 
 
 @receiver(post_save, sender=Match)
@@ -63,16 +66,3 @@ def update_player_form(sender, instance=None, created=False, **kwargs):
             memcache.delete(key)
 
         deferred.defer(update_player_form_cache, instance.pk)
-
-
-@receiver(post_save, sender=Match)
-def increment_granny_count(sender, instance=None, created=False, **kwargs):
-    """Increment the denormalized granny counts on the player instances."""
-    if created and instance.granny:
-        instance.winner.total_grannies_given_count += 1
-        instance.winner.season_grannies_given_count += 1
-        instance.winner.save()
-
-        instance.loser.total_grannies_taken_count += 1
-        instance.loser.season_grannies_taken_count += 1
-        instance.loser.save()
