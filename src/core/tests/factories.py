@@ -2,7 +2,6 @@ from datetime import date, timedelta
 
 from factory import DjangoModelFactory, fuzzy, Iterator, SubFactory, LazyAttribute
 
-from core.models import Player, Match, Season
 from core.models import Player, Match, Season, SeasonPlayer
 
 
@@ -26,9 +25,12 @@ class SeasonFactory(DjangoModelFactory):
     class Meta:
         model = Season
 
+    name = fuzzy.FuzzyText(length=10)
     start_date = fuzzy.FuzzyDate(date(2016, 1, 1))
     end_date = LazyAttribute(lambda o: o.start_date + timedelta(days=10))
     active = False
+
+
 class SeasonPlayerFactory(DjangoModelFactory):
     class Meta:
         model = SeasonPlayer
