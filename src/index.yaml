@@ -127,6 +127,12 @@ indexes:
   - name: season_id
   - name: elo_score
 
+- kind: core_seasonplayer
+  properties:
+  - name: season_id
+  - name: elo_score
+    direction: desc
+
 - kind: cspreports_cspreport
   properties:
   - name: created
