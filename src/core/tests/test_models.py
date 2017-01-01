@@ -1,12 +1,15 @@
 from datetime import timedelta
 
+from google.appengine.api import memcache
+
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from djangae.test import TestCase
 
-from core.models import Match, Season
+from core.models import EloHistory, Match, Season, SeasonPlayer
 from core.tests.factories import MatchFactory, SeasonFactory, PlayerFactory
+from core.utils import form_cache_key
 
 
 class MatchModelTestCase(TestCase):
@@ -44,6 +47,83 @@ class MatchModelTestCase(TestCase):
 
         match = MatchFactory(season=current_season)
         self.assertEqual(match.season, current_season)
+
+    def test_delete(self):
+        """Assert that all of the denormalized fields are reset correctly."""
+        season = SeasonFactory(active=True)
+
+        player_1 = PlayerFactory(active=True)
+        player_2 = PlayerFactory(active=True)
+
+        match_one = MatchFactory(
+            date=season.start_date,
+            winner=player_1,
+            loser=player_2,
+            season=season,
+            granny=False
+        )
+
+        self.process_task_queues()
+
+        # elo points at this point were...
+        player_1.refresh_from_db()
+        player_2.refresh_from_db()
+        winner_elo_original = player_1.total_elo
+        loser_elo_original = player_2.total_elo
+
+        # now lets record an incorrect game
+        match_two = MatchFactory(
+            date=season.start_date + timedelta(days=1),
+            winner=player_1,
+            loser=player_2,
+            season=season,
+            granny=False
+        )
+
+        self.process_task_queues()
+
+        # find out how many elo points were wrongly won/lost
+        player_1.refresh_from_db()
+        player_2.refresh_from_db()
+
+        winner_elo_diff = player_1.total_elo - winner_elo_original
+        loser_elo_diff = loser_elo_original - player_2.total_elo
+
+        match_two.delete()
+
+        player_1.refresh_from_db()
+        player_2.refresh_from_db()
+
+        # check all Player denormalized fields reset
+        self.assertEqual(player_1.total_elo, winner_elo_original)
+        self.assertEqual(player_1.season_elo, winner_elo_original)
+        self.assertEqual(player_1.total_win_count, 1)
+        self.assertEqual(player_1.season_win_count, 1)
+
+        self.assertEqual(player_2.total_elo, loser_elo_original)
+        self.assertEqual(player_2.season_elo, loser_elo_original)
+        self.assertEqual(player_2.total_loss_count, 1)
+        self.assertEqual(player_2.season_loss_count, 1)
+
+        # check the season player is updated
+        player_1_season_player = SeasonPlayer.objects.get(player=player_1, season=season)
+        self.assertEqual(player_1_season_player.elo_score, winner_elo_original)
+        self.assertEqual(player_1_season_player.win_count, 1)
+
+        player_2_season_player = SeasonPlayer.objects.get(player=player_2, season=season)
+        self.assertEqual(player_2_season_player.elo_score, loser_elo_original)
+        self.assertEqual(player_2_season_player.loss_count, 1)
+
+        # the elo history should not longer exist
+        with self.assertRaises(EloHistory.DoesNotExist):
+            EloHistory.objects.get(match=match_two)
+
+        self.process_task_queues()
+
+        # and the cached form should be destroyed
+        for player in (player_1, player_2):
+            self.assertEquals(len(memcache.get(player_1.form_cache_key)), 1)
+
 
 class SeasonModelTestCase(TestCase):
     """Tests for the season model."""
