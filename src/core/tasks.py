@@ -17,7 +17,7 @@ from .models import (
     SeasonPlayer,
 )
 
-from .utils import form_cache_key, calculate_elo
+from .utils import calculate_elo
 
 
 def recalculate_player_elo_ratings():
@@ -85,12 +85,10 @@ def reset_challenges():
             challenge.reset(commit=True)
 
 
-def update_player_form_cache(match_pk):
-    match = Match.objects.get(pk=match_pk)
-    for player in [match.winner, match.loser]:
-        cache_key = form_cache_key(player)
+def update_player_form_cache(winner, loser):
+    for player in [winner, loser]:
         queryset = Match.objects.matches_involving_player(player)
-        memcache.set(cache_key, queryset)
+        memcache.set(player.form_cache_key, queryset)
 
 
 def season_migration():
