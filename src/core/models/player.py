@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from core.utils import form_cache_key
+
 
 class Player(models.Model):
     """Pool players identified by their slack user ID."""
@@ -35,6 +37,10 @@ class Player(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def form_cache_key(self):
+        return form_cache_key(self)
 
     def reset_season_fields(self, commit=True):
         """Reset all related fields."""
