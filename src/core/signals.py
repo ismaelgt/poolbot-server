@@ -2,14 +2,14 @@ from google.appengine.api import memcache
 from google.appengine.ext import deferred
 
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from rest_framework.authtoken.models import Token
 
 from .models import Match, SeasonPlayer, EloHistory
 from .tasks import update_player_form_cache
-from .utils import form_cache_key, calculate_elo
+from .utils import calculate_elo
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -56,13 +56,23 @@ def update_denormalized_player_fields(sender, instance=None, created=False, **kw
 
 
 @receiver(post_save, sender=Match)
-def update_player_form(sender, instance=None, created=False, **kwargs):
+def update_player_form_post_save(sender, instance=None, created=False, **kwargs):
     """Update the cached form querysets for two players in a match."""
     if created and instance:
         # wipe the cache incase we try and fetch before the deferred task runs
         players = [instance.winner, instance.loser]
-        cache_keys = [form_cache_key(player) for player in players]
-        for key in cache_keys:
-            memcache.delete(key)
+        for player in players:
+            memcache.delete(player.form_cache_key)
 
-        deferred.defer(update_player_form_cache, instance.pk)
+        deferred.defer(update_player_form_cache, instance.winner, instance.loser)
+
+
+@receiver(post_delete, sender=Match)
+def update_player_form_post_save(sender, instance=None, created=False, **kwargs):
+    """Update the cached form querysets for two players in a match."""
+    # wipe the cache incase we try and fetch before the deferred task runs
+    players = [instance.winner, instance.loser]
+    for player in players:
+        memcache.delete(player.form_cache_key)
+
+    deferred.defer(update_player_form_cache, instance.winner, instance.loser)
