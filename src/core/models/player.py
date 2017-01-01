@@ -60,10 +60,24 @@ class Player(models.Model):
         if commit:
             self.save()
 
+    def decrement_win_counts(self, commit=True):
+        """Decrement denormalized win counts."""
+        self.total_win_count -= 1
+        self.season_win_count -= 1
+        if commit:
+            self.save()
+
     def increment_loss_counts(self, commit=True):
         """Increment denormalized loss counts."""
         self.total_loss_count += 1
         self.season_loss_count += 1
+        if commit:
+            self.save()
+
+    def decrement_loss_counts(self, commit=True):
+        """Decrement denormalized loss counts."""
+        self.total_loss_count -= 1
+        self.season_loss_count -= 1
         if commit:
             self.save()
 
@@ -79,6 +93,17 @@ class Player(models.Model):
         if commit:
             self.save()
 
+    def increment_elo_score(self, elo_points, commit=True):
+        self.total_elo += elo_points
+        self.season_elo += elo_points
+        if commit:
+            self.save()
+
+    def decrement_elo_score(self, elo_points, commit=True):
+        self.total_elo -= elo_points
+        self.season_elo -= elo_points
+        if commit:
+            self.save()
 
 
 

@@ -40,3 +40,14 @@ class SeasonPlayer(models.Model):
             season=self.season
         )
 
+    def undo_win(self, elo_points, commit=True):
+        self.elo_score -= elo_points
+        self.win_count -= 1
+        if commit:
+            self.save()
+
+    def undo_loss(self, elo_points, commit=True):
+        self.elo_score += elo_points
+        self.loss_count -= 1
+        if commit:
+            self.save()
