@@ -64,6 +64,11 @@ indexes:
 
 - kind: core_match
   properties:
+  - name: __key__
+    direction: desc
+
+- kind: core_match
+  properties:
   - name: granny
   - name: loser_id
   - name: date
