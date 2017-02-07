@@ -1,4 +1,6 @@
 from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
+from django.conf import settings
 
 import session_csrf
 session_csrf.monkeypatch()
@@ -25,4 +27,9 @@ urlpatterns = patterns('',
 
     url(r'^tasks/', include('core.urls')),
 
+    url(r'^leaderboard/', include('leaderboard.urls')),
+
 )
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

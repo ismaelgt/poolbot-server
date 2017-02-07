@@ -19,3 +19,5 @@ SECURE_CHECKS += ["app.checks.check_csp_sources_not_unsafe"]
 
 DEBUG = False
 TEMPLATE_DEBUG = False
+
+STATIC_URL = '/static/'
