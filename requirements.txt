@@ -13,3 +13,4 @@ django-webtest
 mock
 requests
 requests-toolbelt
+decorator
