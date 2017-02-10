@@ -1,13 +1,14 @@
 import json
 import logging
 
+from django.conf import settings
+
 import requests
 import requests_toolbelt.adapters.appengine
 
-from .cache import Cache
-
 from core.models import Player
-from .models import LeaderboardConfig
+
+from .cache import Cache
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -28,16 +29,13 @@ def get_slack_names(source='file'):
         with open('./leaderboard/slack_user_list.json') as f:
             content = json.loads(f.read())
     else:
-        config, _ = LeaderboardConfig.objects.get_or_create()
-        if not config.slack_api_token:
-            raise Exception('Add your Slack token to the LeaderboardConfig object in the Datastore')
+        if settings.SLACK_API_TOKEN is None:
+            raise Exception('Please add your Slack API token to ./src/app/extra_setting.py')
 
         url = 'https://slack.com/api/users.list'
         response = requests.get(
             url,
-            params=dict(
-                token=config.slack_api_token
-            )
+            params=dict(token=settings.SLACK_API_TOKEN)
         )
         content = response.json()
 

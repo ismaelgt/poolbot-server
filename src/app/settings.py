@@ -164,8 +164,11 @@ TEMPLATES = [
 ]
 
 AUTHORISED_LEADERBOARD_IPS = []
+SLACK_API_TOKEN = None
 
 try:
+    # extra_settings.py is excluded from source control and is used to store
+    # sensitive information
     from .extra_settings import *
 except ImportError:
     logging.info('Extra settings not found')
