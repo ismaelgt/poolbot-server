@@ -26,12 +26,14 @@ def get_slack_names(source='file'):
         return slack_names
 
     if source == 'file':
+        # read slack user list from file (excluded from git)
         with open('./leaderboard/slack_user_list.json') as f:
             content = json.loads(f.read())
     else:
         if settings.SLACK_API_TOKEN is None:
             raise Exception('Please add your Slack API token to ./src/app/extra_setting.py')
 
+        # call the Slack API to get the user list
         url = 'https://slack.com/api/users.list'
         response = requests.get(
             url,
@@ -40,6 +42,7 @@ def get_slack_names(source='file'):
         content = response.json()
 
     if content['ok']:
+        # create a mapping of user id -> real name and add it to the cache
         slack_names = {
             u['id']: u['real_name']
             for u in content['members']
@@ -60,33 +63,41 @@ def get_diff(player):
 
 
 def get_players():
-    players = Player.objects.filter(active=True).order_by('-season_elo')
+    qs = Player.objects.filter(active=True).order_by('-season_elo')
     slack_names = get_slack_names()
 
-    _players = [
+    players = [
         dict(
             name=slack_names.get(player.slack_id, player.name),
             season_elo=player.season_elo,
             diff=get_diff(player),
             slack_id=player.slack_id,
         )
-        for player in players
+        for player in qs
         if player.active and (player.season_win_count + player.season_loss_count) > 0
     ]
 
-    # this code is horrible spaghetti, please forgive me
+    players_with_positions = add_positions(players)
+    return players_with_positions
+
+
+def add_positions(players):
+    """calculates and adds the player positions for table listing"""
     position = 1
-    for idx, player in enumerate(_players):
+    for idx, player in enumerate(players):
         player['id'] = idx
         if idx == 0:
             # first place - no previous player to compare
             player['position'] = position
         else:
-            previous_player = _players[idx - 1]
+            # keep track of the previous player, if the current player has the
+            # same points then they are tied so we mark with a hyphen
+            previous_player = players[idx - 1]
             if previous_player['season_elo'] == player['season_elo']:
                 player['position'] = '-'
             else:
                 player['position'] = position
+
         position += 1
 
-    return _players
+    return players
