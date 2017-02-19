@@ -164,7 +164,6 @@ TEMPLATES = [
 ]
 
 AUTHORISED_LEADERBOARD_IPS = []
-SLACK_API_TOKEN = None
 
 try:
     # extra_settings.py is excluded from source control and is used to store

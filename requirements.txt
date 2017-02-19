@@ -11,6 +11,4 @@ django-filter
 factory-boy
 django-webtest
 mock
-requests
-requests-toolbelt
 decorator

@@ -20,37 +20,7 @@ PLAYERS_CACHE_TIMEOUT = 30
 cache = Cache()
 
 
-def get_slack_names(source='file'):
-    slack_names = cache.get(SLACK_NAMES_CACHE_KEY)
-    if slack_names:
-        return slack_names
 
-    if source == 'file':
-        # read slack user list from file (excluded from git)
-        with open('./leaderboard/slack_user_list.json') as f:
-            content = json.loads(f.read())
-    else:
-        if settings.SLACK_API_TOKEN is None:
-            raise Exception('Please add your Slack API token to ./src/app/extra_setting.py')
-
-        # call the Slack API to get the user list
-        url = 'https://slack.com/api/users.list'
-        response = requests.get(
-            url,
-            params=dict(token=settings.SLACK_API_TOKEN)
-        )
-        content = response.json()
-
-    if content['ok']:
-        # create a mapping of user id -> real name and add it to the cache
-        slack_names = {
-            u['id']: u['real_name']
-            for u in content['members']
-            if 'real_name' in u
-        }
-        cache.set(SLACK_NAMES_CACHE_KEY, slack_names)
-        return slack_names
-    else:
         logging.error(content['error'])
 
 
