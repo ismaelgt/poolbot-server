@@ -1,12 +1,10 @@
 # Poolbot Server
 
-This is a djangae project which provides persistent storage and an API for the [poolbot slack client](https://github.com/dannymilsom/poolbot).
+This is a djangae project which provides persistent storage, a RESTful API and leaderboard interface for the [poolbot slack client](https://github.com/dannymilsom/poolbot).
 
+## Getting Started
 
-# Leaderboard
-
-
-## Install dependencies
+First install all the dependencies:
 
 ```
   mkvirtualenv poolbot-server
@@ -17,9 +15,6 @@ This is a djangae project which provides persistent storage and an API for the [
   ./src/manage.py collectstatic
 ```
 
-## Setting up
+Complete the next steps to finish the leaderboard config:
 
-The following two steps must be completed to enable the leaderboard:
-
-1. Create `src/leaderboard/slack_user_list.json` and paste in the contents of the response from https://api.slack.com/methods/users.list/test (this is a temporary work around)
-2. Run `cp src/app/extra_settings.py.base src/app/extra_settings.py` and add the IPs granted access to AUTHORISED_LEADERBOARD_IPS.  The reason for IP whitelisting is that the leaderboard is designed to be used on a public computer where user level authentication would be a security issue.
+2. Run `cp src/app/extra_settings.py.base src/app/extra_settings.py` and add the IPs granted access to AUTHORISED_LEADERBOARD_IPS. The reason for IP whitelisting is that the leaderboard is designed to be used on a public computer where user level authentication would be a security issue.
