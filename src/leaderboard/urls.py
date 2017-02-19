@@ -10,7 +10,7 @@ urlpatterns = patterns(
     ),
     url(
         r'',
-        LeaderboardIndex.as_view(),
+        'index',
         name="leaderboard-index"
     ),
 )
