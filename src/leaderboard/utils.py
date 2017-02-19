@@ -32,23 +32,26 @@ def get_diff(player):
     return 0
 
 
-def get_players():
+def get_leaderboard_data():
+    """
+    Format data ready for the leaderboard display, by filtering all active
+    players in the current season who have played a match.
+    """
+    # TODO all this could probably go on the Player model manager
     qs = Player.objects.filter(active=True).order_by('-season_elo')
-    slack_names = get_slack_names()
 
     players = [
         dict(
-            name=slack_names.get(player.slack_id, player.name),
+            name=player.full_name,
             season_elo=player.season_elo,
             diff=get_diff(player),
             slack_id=player.slack_id,
         )
         for player in qs
-        if player.active and (player.season_win_count + player.season_loss_count) > 0
+        if (player.season_win_count + player.season_loss_count) > 0
     ]
 
-    players_with_positions = add_positions(players)
-    return players_with_positions
+    return add_leaderboard_positions(players)
 
 
 def add_positions(players):
