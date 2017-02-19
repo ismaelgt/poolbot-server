@@ -1,31 +1,16 @@
-import json
-import logging
-
-from django.conf import settings
-
-import requests
-import requests_toolbelt.adapters.appengine
-
 from core.models import Player
 
-from .cache import Cache
-
-requests_toolbelt.adapters.appengine.monkeypatch()
+from .cache import LeaderboardCache
 
 SLACK_NAMES_CACHE_KEY = 'slack_name'
 PREVIOUS_STATE_CACHE_KEY = 'players_previous'
 PLAYERS_CACHE_KEY = 'players'
-PLAYERS_CACHE_TIMEOUT = 30
 
-cache = Cache()
-
-
-
-        logging.error(content['error'])
+cache = LeaderboardCache()
 
 
 def get_diff(player):
-    """returns num season_elo points gained/lost since the previous state"""
+    """Returns num season_elo points gained/lost since the previous state."""
     for player_previous_state in cache.get(PREVIOUS_STATE_CACHE_KEY) or []:
         if player_previous_state['slack_id'] == player.slack_id:
             return player.season_elo - player_previous_state['season_elo']
@@ -42,7 +27,7 @@ def get_leaderboard_data():
 
     players = [
         dict(
-            name=player.full_name,
+            name=player.real_name,
             season_elo=player.season_elo,
             diff=get_diff(player),
             slack_id=player.slack_id,
@@ -54,8 +39,8 @@ def get_leaderboard_data():
     return add_leaderboard_positions(players)
 
 
-def add_positions(players):
-    """calculates and adds the player positions for table listing"""
+def add_leaderboard_positions(players):
+    """Calculates and adds the player positions for leaderboard table listing."""
     position = 1
     for idx, player in enumerate(players):
         player['id'] = idx
