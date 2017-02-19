@@ -1,5 +1,5 @@
 {
-  "name": "poolbot-leaderboard",
+  "name": "poolbot-server",
   "version": "1.0.0",
   "devDependencies": {
     "babel": "^6.5.2",
