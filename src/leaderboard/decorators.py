@@ -11,7 +11,7 @@ def ip_authorization(func, *args, **kwargs):
     if not settings.AUTHORISED_LEADERBOARD_IPS:
         logging.warning(
             'No AUTHORISED_LEADERBOARD_IPS defined, board is publicly viewable')
-        return
+        return func(*args, **kwargs)
 
     request = args[0]
     request_ip = request.META['REMOTE_ADDR']
