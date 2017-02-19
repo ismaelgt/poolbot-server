@@ -3,7 +3,16 @@ import time
 from django.core.cache import cache
 
 
-class Cache(object):
+PLAYERS_CACHE_TIMEOUT = 30
+
+
+class LeaderboardCache(object):
+    """
+    Helper class to increase latency and reduce resource use when polling the
+    leaderboard API.
+    """
+
+    DEFAULT_CACHE_TIMEOUT = PLAYERS_CACHE_TIMEOUT # seconds
 
     def get(self, key, default=None):
         if default is None:
@@ -16,6 +25,9 @@ class Cache(object):
 
     def set(self, key, value, timeout=None):
         now = time.time()
+        timeout = (
+            self.DEFAULT_CACHE_TIMEOUT if timeout is None else timeout
+        )
         cache.set(key, dict(value=value, start=now, timeout=timeout))
 
     def time_remaining(self, key):
