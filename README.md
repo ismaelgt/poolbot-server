@@ -15,6 +15,4 @@ First install all the dependencies:
   ./src/manage.py collectstatic
 ```
 
-Complete the next steps to finish the leaderboard config:
-
-2. Run `cp src/app/extra_settings.py.base src/app/extra_settings.py` and add the IPs granted access to AUTHORISED_LEADERBOARD_IPS. The reason for IP whitelisting is that the leaderboard is designed to be used on a public computer where user level authentication would be a security issue.
+To finish the leaderboard config run `cp src/app/extra_settings.py.base src/app/extra_settings.py` and add the IPs granted access to AUTHORISED_LEADERBOARD_IPS. The reason for IP whitelisting is that the leaderboard is designed to be used on a public computer where user level authentication would be a security issue.
