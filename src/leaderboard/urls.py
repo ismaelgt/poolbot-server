@@ -6,11 +6,11 @@ urlpatterns = patterns(
     url(
         r'api/$',
         'api',
-        name="leaderboard"
+        name="leaderboard-api"
     ),
     url(
         r'',
-        'index',
-        name="leaderboard"
+        LeaderboardIndex.as_view(),
+        name="leaderboard-index"
     ),
 )
