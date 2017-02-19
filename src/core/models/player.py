@@ -9,6 +9,7 @@ class Player(models.Model):
 
     slack_id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=100)
     joined = models.DateTimeField(default=timezone.now)
 
     # some meta data which we allow users to modify
