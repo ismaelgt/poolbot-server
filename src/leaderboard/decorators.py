@@ -7,8 +7,10 @@ from django.conf import settings
 
 @decorator
 def ip_authorization(func, *args, **kwargs):
+    """Limit requests to whitelised IP addresses if configured."""
     if not settings.AUTHORISED_LEADERBOARD_IPS:
-        logging.info('No AUTHORISED_LEADERBOARD_IPS defined, board is publicly viewable')
+        logging.warning(
+            'No AUTHORISED_LEADERBOARD_IPS defined, board is publicly viewable')
         return
 
     request = args[0]
