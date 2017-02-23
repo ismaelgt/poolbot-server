@@ -8,18 +8,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
-from djangae.settings_base import * #Set up some AppEngine specific stuff
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import logging
+import os
+
 from django.core.urlresolvers import reverse_lazy
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
+from djangae.contrib.gauth.settings import *
+from djangae.settings_base import *  # Set up some AppEngine specific stuff
+
+from .boot import get_app_config
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
-from .boot import get_app_config
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = get_app_config().secret_key
 
@@ -31,7 +36,7 @@ TEMPLATE_DEBUG = True
 # Application definition
 
 INSTALLED_APPS = (
-    'djangae', # Djangae needs to come before django apps in django 1.7 and above
+    'djangae',  # Djangae needs to come before django apps in django 1.7 and above
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +53,7 @@ INSTALLED_APPS = (
 
     'api',
     'core',
+    'leaderboard',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -59,7 +65,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'djangae.contrib.gauth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'csp.middleware.CSPMiddleware',
+    # 'csp.middleware.CSPMiddleware',
     'session_csrf.CsrfMiddleware',
     'djangosecure.middleware.SecurityMiddleware',
 )
@@ -126,8 +132,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_URL = '/static/'
-
+STATIC_URL = '/static-dev/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 if DEBUG:
     CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
@@ -136,10 +142,32 @@ if DEBUG:
 CSP_DEFAULT_SRC = ("'self'", "*.gstatic.com")
 CSP_STYLE_SRC = ("'self'", "fonts.googleapis.com", "*.gstatic.com")
 CSP_FONT_SRC = ("'self'", "themes.googleusercontent.com", "*.gstatic.com")
-CSP_FRAME_SRC = ("'self'", "www.google.com", "www.youtube.com", "accounts.google.com", "apis.google.com", "plus.google.com")
+CSP_FRAME_SRC = ("'self'", "www.google.com", "www.youtube.com",
+                 "accounts.google.com", "apis.google.com", "plus.google.com")
 CSP_SCRIPT_SRC = ("'self'", "*.googleanalytics.com", "*.google-analytics.com", "ajax.googleapis.com")
 CSP_IMG_SRC = ("'self'", "data:", "s.ytimg.com", "*.googleusercontent.com", "*.gstatic.com")
 CSP_CONNECT_SRC = ("'self'", "plus.google.com", "www.google-analytics.com")
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
-from djangae.contrib.gauth.settings import *
+AUTHORISED_LEADERBOARD_IPS = []
+
+try:
+    # extra_settings.py is excluded from source control and is used to store
+    # sensitive information
+    from .extra_settings import *
+except ImportError:
+    logging.info('Extra settings not found')
