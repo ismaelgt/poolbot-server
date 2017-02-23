@@ -2,11 +2,13 @@ import logging
 from collections import defaultdict
 from datetime import timedelta
 
+from django.conf import settings
 from django.utils import timezone
 
 from djangae.db.transaction import atomic
 
 from google.appengine.api import memcache
+from google.appengine.ext import deferred
 
 from .models import (
     Challenge,
@@ -193,3 +195,19 @@ def season_player_migration():
                 win_count=win_count,
                 loss_count=loss_count
             )
+
+def update_player_fields():
+    """
+    Hit the slack API to fetch all player details, and update any field
+    values which are outdated or missing.
+    """
+    # check we have a SLACK TOKEN to authenticate with
+    try:
+        slack_token = settings.SLACK_API_TOKEN
+    except ImportError:
+        logging.error("Unable to find SLACK API TOKEN.")
+        return
+
+    # all good - continue
+    for player in Player.objects.all():
+        deferred.defer(player.update_slack_fields, slack_token)

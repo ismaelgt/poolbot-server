@@ -47,6 +47,11 @@ task_patterns = patterns("core.views",
         'season_player_migration',
         name='season_player_migration'
     ),
+    url(
+        '^update-slack-fields',
+        'update_slack_player_fields',
+        name='update_slack_fields'
+    ),
 )
 
 

@@ -1,11 +1,23 @@
+import json
+import logging
+import urllib
+
 from django.db import models
 from django.utils import timezone
+
+from google.appengine.api import urlfetch
 
 from core.utils import form_cache_key
 
 
 class Player(models.Model):
     """Pool players identified by their slack user ID."""
+
+    SLACK_DETAIL_URL = 'https://slack.com/api/users.info'
+    MUTABLE_SLACK_FIELDS = (
+        'name',
+        'real_name',
+    )
 
     slack_id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=100)
@@ -106,5 +118,34 @@ class Player(models.Model):
         if commit:
             self.save()
 
+    def update_slack_fields(self, auth_token, commit=True):
+        """
+        Update the mutable slack fields by fetching
+        the latest values from the live slack API.
+        """
+        get_params = urllib.urlencode({
+            'token': auth_token,
+            'user': self.slack_id,
+        })
+        url = '{base_url}?{params}'.format(
+            base_url=self.SLACK_DETAIL_URL,
+            params=get_params
+        )
 
+        response = urlfetch.fetch(url, validate_certificate=True)
+        data = json.loads(response.content)
+
+        try:
+            for field, value in data['user'].iteritems():
+                if field in self.MUTABLE_SLACK_FIELDS:
+                    setattr(self, field, value)
+        except KeyError:
+            logging.warn(
+                "Unable to get slack info for {}".format(
+                    self.pk
+                )
+            )
+        else:
+            if commit:
+                self.save()
 

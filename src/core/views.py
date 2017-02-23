@@ -65,3 +65,9 @@ def season_player_migration(request):
     """Retrospectively generate Season Player instances."""
     deferred.defer(tasks.season_player_migration)
     return HttpResponse('Ok')
+
+
+def update_slack_player_fields(request):
+    """Fetch any updated field values from the live slack API."""
+    deferred.defer(tasks.update_player_fields)
+    return HttpResponse('Ok')

@@ -170,4 +170,4 @@ try:
     # sensitive information
     from .extra_settings import *
 except ImportError:
-    logging.info('Extra settings not found')
+    logging.warning('Extra settings not found')
