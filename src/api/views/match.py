@@ -21,8 +21,8 @@ class MatchViewSet(TokenRequiredModelViewSet):
 
     def perform_create(self, serializer):
         """
-        To avoid the client always knowing the active season
-        we find it and inject it here.
+        To avoid the client always knowing the active season we find the
+        currently active instance and inject it here.
         """
         active_season = Season.objects.get(active=True)
         serializer.save(season=active_season)

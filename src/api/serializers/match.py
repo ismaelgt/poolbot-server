@@ -4,9 +4,15 @@ from core.models import Match
 
 
 class MatchSerializer(serializers.ModelSerializer):
+    """
+    Season is read_only for the external API, because we force it to
+    use the currently active season inside the MatchViewSet.perform_create()
+    method.
 
-    # season is pre-populated before save in perform_create()
-    season = serializers.CharField(required=False)
+    This means that you can ONLY record matches for the currently active
+    season, as this is the poolbot centric use case to record match results
+    after they have just finished via a client (slack, NFC etc.)
+    """
 
     class Meta:
         model = Match
@@ -20,5 +26,6 @@ class MatchSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'date',
+            'season',
         )
 
