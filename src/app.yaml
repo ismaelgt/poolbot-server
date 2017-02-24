@@ -40,7 +40,7 @@ skip_files:
     - README.md
     - install_deps
     - requirements.txt
-    - sitepackages/google_appengine*
+    - sitepackages/dev*
     - \.storage.*
     - \.git
     - (.*)\.pyc
