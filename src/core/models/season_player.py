@@ -8,7 +8,7 @@ class SeasonPlayerManager(models.Manager):
 
     def update_active(self, player, elo, wins, losses):
         """Update or create the season player instance for the active season."""
-        active_season = Season.objects.get(active=True)
+        active_season = Season.objects.get_active()
 
         updated_values = {
             'player': player,

@@ -24,7 +24,7 @@ class MatchViewSet(TokenRequiredModelViewSet):
         To avoid the client always knowing the active season we find the
         currently active instance and inject it here.
         """
-        active_season = Season.objects.get(active=True)
+        active_season = Season.objects.get_active()
         serializer.save(season=active_season)
 
     @list_route(methods=['get'])

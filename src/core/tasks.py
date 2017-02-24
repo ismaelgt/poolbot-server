@@ -126,7 +126,7 @@ def set_active_season():
     today = timezone.now().date()
 
     try:
-        season = Season.objects.get(active=True)
+        season = Season.objects.get_active()
     except Season.DoesNotExist:
         season = None
     else:

@@ -141,9 +141,21 @@ class SeasonModelTestCase(TestCase):
         season_one = SeasonFactory(active=True)
         self.assertTrue(season_one.active)
 
+        # setting the active season will also put it into memcache
+        self.assertEqual(
+            season_one,
+            memcache.get(Season.ACTIVE_SEASON_CACHE_KEY)
+        )
+
         # trying to create a second season with active=True is not allowed
         with self.assertRaises(ValidationError):
             season_two = SeasonFactory(active=True)
+
+        # and the original season stays in memcache
+        self.assertEqual(
+            season_one,
+            memcache.get(Season.ACTIVE_SEASON_CACHE_KEY)
+        )
 
         # sanity check you can modify other values when the active flag is
         # set, and the validation does not mistakenly think another active 
@@ -165,6 +177,12 @@ class SeasonModelTestCase(TestCase):
 
         season.activate()
 
+        # setting the active season will also put it into memcache
+        self.assertEqual(
+            season,
+            memcache.get(Season.ACTIVE_SEASON_CACHE_KEY)
+        )
+
         season.refresh_from_db()
         self.assertTrue(season.active)
         
@@ -179,9 +197,32 @@ class SeasonModelTestCase(TestCase):
         season = SeasonFactory(active=True)
         self.assertTrue(season.active)
 
+        # setting the active season will also put it into memcache
+        self.assertEqual(
+            season,
+            memcache.get(Season.ACTIVE_SEASON_CACHE_KEY)
+        )
+
         season.deactivate()
 
         season.refresh_from_db()
         self.assertFalse(season.active)
+
+        # setting the deactivated season is deleted from the cache
+        self.assertIsNone(memcache.get(Season.ACTIVE_SEASON_CACHE_KEY))
+
+    def test_get_active_helper(self):
+        # should raise DoesNotExist if no active season
+        with self.assertRaises(Season.DoesNotExist):
+            Season.objects.get_active()
+
+        # and the correct season if one is active
+        active_season = SeasonFactory(active=True)
+        inactive_season = SeasonFactory(active=False)
+
+        self.assertEqual(
+            active_season,
+            Season.objects.get_active()
+        )
 
 
