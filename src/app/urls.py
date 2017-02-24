@@ -11,9 +11,6 @@ admin.autodiscover()
 from api.urls import api_router
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'app.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
     url(r'^_ah/', include('djangae.urls')),
 
     # Note that by default this is also locked down with login:admin in app.yaml
