@@ -19,6 +19,15 @@ class SeasonPlayerManager(models.Manager):
         }
         SeasonPlayer.objects.update_or_create(player=player, season=active_season, defaults=updated_values)
 
+    def get_winner(self, season):
+        """Returns the player with the most elo points for the given season."""
+        return (
+            self.get_queryset()
+                .filter(season=season)
+                .order_by('-elo_score')
+                .first()
+        )
+
 
 class SeasonPlayer(models.Model):
     """Denormalized representation of a player for a particular season."""

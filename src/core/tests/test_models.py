@@ -4,11 +4,14 @@ from google.appengine.api import memcache
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db.models.signals import post_save
 
 from djangae.test import TestCase
 
+import factory
+
 from core.models import EloHistory, Match, Season, SeasonPlayer
-from core.tests.factories import MatchFactory, SeasonFactory, PlayerFactory
+from core.tests.factories import MatchFactory, SeasonFactory, SeasonPlayerFactory, PlayerFactory
 from core.utils import form_cache_key
 
 
@@ -226,3 +229,27 @@ class SeasonModelTestCase(TestCase):
         )
 
 
+class SeasonPlayerModelTestCase(TestCase):
+
+    @factory.django.mute_signals(post_save)
+    def test_season_winner(self):
+        season_one = SeasonFactory(active=False)
+
+        player_1 = PlayerFactory()
+        player_2 = PlayerFactory()
+
+        season_player_one = SeasonPlayerFactory(
+            season=season_one,
+            player=player_1,
+            elo_score=2000,
+        )
+        season_player_two = SeasonPlayerFactory(
+            season=season_one,
+            player=player_2,
+            elo_score=1500,
+        )
+
+        self.assertEqual(
+            season_player_one.pk,
+            SeasonPlayer.objects.get_winner(season_one).pk,
+        )
