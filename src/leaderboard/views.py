@@ -1,14 +1,15 @@
+import datetime
+
+from google.appengine.api import memcache
 from django.shortcuts import render
 from django.http import JsonResponse
+from core.models import Player
 
-from .cache import PLAYERS_CACHE_TIMEOUT
-from .utils import (
-    cache,
-    PLAYERS_CACHE_KEY,
-    PREVIOUS_STATE_CACHE_KEY,
-    get_leaderboard_data,
-)
 from .decorators import ip_authorization
+
+LEADERBOARD_CACHE_KEY = 'players'
+PREVIOUS_LEADERBOARD_CACHE_KEY = 'players_previous'
+PLAYERS_CACHE_TIMEOUT = 30
 
 
 @ip_authorization
@@ -20,30 +21,92 @@ def index(request):
 @ip_authorization
 def api(request):
     """Internal API hit by the leaderboard index."""
-    current_state = cache.get(PLAYERS_CACHE_KEY)
-    previous_state = cache.get(PREVIOUS_STATE_CACHE_KEY)
+    LAST_UPDATED_CACHE_KEY = 'last_updated'
+    leaderboard = memcache.get(LEADERBOARD_CACHE_KEY)
+    previous_leaderboard = memcache.get(PREVIOUS_LEADERBOARD_CACHE_KEY) or leaderboard
 
-    if not current_state and not previous_state:
-        players = get_leaderboard_data()
-        cache.set(PLAYERS_CACHE_KEY, players)
-        cache.set(PREVIOUS_STATE_CACHE_KEY, players)
-    elif current_state is None:
-        # cache has expired, refresh the players list
-        players = get_leaderboard_data()
+    if leaderboard is None:
+        leaderboard = get_leaderboard(previous_leaderboard)
 
-        no_change = set([p['diff'] for p in players]) == set([0])
-        if no_change:
-            # elo hasn't changed meaning no one has played
-            cache.set(PLAYERS_CACHE_KEY, previous_state)
-        else:
-            # someone's played, update the table
-            cache.set(PLAYERS_CACHE_KEY, players)
-            cache.set(PREVIOUS_STATE_CACHE_KEY, players)
+        # provide a timeout for the current leaderboard
+        memcache.add(key=LEADERBOARD_CACHE_KEY, value=leaderboard, time=PLAYERS_CACHE_TIMEOUT)
+        memcache.add(key=PREVIOUS_LEADERBOARD_CACHE_KEY, value=leaderboard)
+        memcache.add(key=LAST_UPDATED_CACHE_KEY, value=datetime.datetime.now(), time=PLAYERS_CACHE_TIMEOUT)
+
+    last_updated = memcache.get(LAST_UPDATED_CACHE_KEY)
+    if last_updated:
+        cached_for = (datetime.datetime.now() - last_updated).seconds
+    else:
+        cached_for = 0
 
     return JsonResponse(
         dict(
-            players=cache.get(PLAYERS_CACHE_KEY),
-            secondsLeft=cache.time_remaining(PLAYERS_CACHE_KEY),
+            players=leaderboard,
+            secondsLeft=PLAYERS_CACHE_TIMEOUT - cached_for,
             cacheLifetime=PLAYERS_CACHE_TIMEOUT
         )
     )
+
+
+# Utility functions
+
+def get_leaderboard(previous_leaderboard=None):
+    """
+    Format data ready for the leaderboard display, by filtering all active
+    players in the current season who have played a match.
+    """
+    # TODO all this could probably go on the Player model manager
+    players = Player.objects.filter(active=True).order_by('-season_elo')
+
+    leaderboard = []
+    for player in players:
+        # exclude players who haven't played this season
+        if (player.season_win_count + player.season_loss_count) == 0:
+            continue
+
+        leaderboard.append(
+            dict(
+                name=player.real_name,
+                season_elo=player.season_elo,
+                diff=get_diff(player, previous_leaderboard) if previous_leaderboard else 0,
+                slack_id=player.slack_id,
+            )
+        )
+
+    return add_leaderboard_positions(leaderboard)
+
+
+def get_diff(player, previous_leaderboard):
+    """Returns num season_elo points gained/lost since the previous state."""
+    player_previous_state = get_previous_player_state(player, previous_leaderboard)
+    if player_previous_state:
+        return player.season_elo - player_previous_state['season_elo']
+    return 0
+
+
+def get_previous_player_state(player, previous_leaderboard):
+    for player_previous_state in previous_leaderboard:
+        if player_previous_state['slack_id'] == player.slack_id:
+            return player_previous_state
+
+
+def add_leaderboard_positions(players):
+    """Calculates and adds the player positions for leaderboard table listing."""
+    position = 1
+    for idx, player in enumerate(players):
+        player['id'] = idx
+        if idx == 0:
+            # first place - no previous player to compare
+            player['position'] = position
+        else:
+            # keep track of the previous player, if the current player has the
+            # same points then they are tied so we mark with a hyphen
+            previous_player = players[idx - 1]
+            if previous_player['season_elo'] == player['season_elo']:
+                player['position'] = '-'
+            else:
+                player['position'] = position
+
+        position += 1
+
+    return players
