@@ -44,3 +44,4 @@ skip_files:
     - \.storage.*
     - \.git
     - (.*)\.pyc
+    - node_modules
