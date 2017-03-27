@@ -133,11 +133,19 @@ class Player(models.Model):
         )
 
         response = urlfetch.fetch(url, validate_certificate=True)
+
+        if response.status_code != 200:
+            logging.error(response.content)
+            return
+
         data = json.loads(response.content)
 
         try:
             for field, value in data['user'].iteritems():
                 if field in self.MUTABLE_SLACK_FIELDS:
+                    if not value:
+                        continue
+
                     setattr(self, field, value)
         except KeyError:
             logging.warn(
@@ -148,4 +156,3 @@ class Player(models.Model):
         else:
             if commit:
                 self.save()
-
