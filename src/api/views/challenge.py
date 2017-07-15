@@ -10,7 +10,6 @@ class ChallengeViewSet(TokenRequiredModelViewSet):
 
     serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
-    permissions = []
     filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('initiator', 'challenger', 'channel')
 

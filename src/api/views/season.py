@@ -10,6 +10,5 @@ class SeasonViewSet(TokenRequiredModelViewSet):
 
     serializer_class = SeasonSerializer
     queryset = Season.objects.all()
-    permissions = []
     filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('active', 'name')

@@ -16,7 +16,6 @@ class PlayerViewSet(TokenRequiredModelViewSet):
 
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
-    permissions = []
     filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('active', 'total_grannies_given_count')
 

@@ -15,7 +15,6 @@ class MatchViewSet(TokenRequiredModelViewSet):
 
     serializer_class = MatchSerializer
     queryset = Match.objects.all()
-    permissions = []
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('winner', 'loser' , 'season')
 
