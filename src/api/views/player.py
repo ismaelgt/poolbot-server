@@ -1,6 +1,5 @@
 from google.appengine.api import memcache
 
-from rest_framework import filters
 
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
@@ -16,7 +15,6 @@ class PlayerViewSet(TokenRequiredModelViewSet):
 
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
-    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('active', 'total_grannies_given_count')
 
     def get_serializer_class(self):

@@ -1,5 +1,3 @@
-from rest_framework import filters
-
 from core.models import Season
 
 from .base import TokenRequiredModelViewSet
@@ -10,5 +8,4 @@ class SeasonViewSet(TokenRequiredModelViewSet):
 
     serializer_class = SeasonSerializer
     queryset = Season.objects.all()
-    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('active', 'name')

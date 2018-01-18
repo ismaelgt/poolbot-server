@@ -1,5 +1,3 @@
-from rest_framework import filters
-
 from core.models import Challenge
 
 from .base import TokenRequiredModelViewSet
@@ -10,6 +8,5 @@ class ChallengeViewSet(TokenRequiredModelViewSet):
 
     serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
-    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
     filter_fields = ('initiator', 'challenger', 'channel')
 

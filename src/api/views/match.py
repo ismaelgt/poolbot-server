@@ -1,7 +1,6 @@
 from itertools import chain
 from operator import attrgetter
 
-from rest_framework import filters
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
@@ -15,7 +14,6 @@ class MatchViewSet(TokenRequiredModelViewSet):
 
     serializer_class = MatchSerializer
     queryset = Match.objects.all()
-    filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('winner', 'loser' , 'season')
 
     def perform_create(self, serializer):
