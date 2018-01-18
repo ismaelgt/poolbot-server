@@ -48,12 +48,26 @@ def update_denormalized_player_fields(sender, instance=None, created=False, **kw
         # defer denormalization onto season player - this is safe
         # to defer as the serialized response from the API after
         # recording a game does not embed any data from this model
-        deferred.defer(SeasonPlayer.objects.update_active, player=winner, elo=winner_season_elo, wins=winner.season_win_count, losses=winner.season_loss_count)
-        deferred.defer(SeasonPlayer.objects.update_active, player=loser, elo=loser_season_elo, wins=loser.season_win_count, losses=loser.season_loss_count)
+        deferred.defer(
+            SeasonPlayer.objects.update_active,
+            player=winner, elo=winner_season_elo,
+            wins=winner.season_win_count, losses=winner.season_loss_count
+        )
+        deferred.defer(
+            SeasonPlayer.objects.update_active,
+            player=loser, elo=loser_season_elo,
+            wins=loser.season_win_count, losses=loser.season_loss_count
+        )
 
         # finally create an elo instance to track history of score
-        EloHistory.objects.create(player=winner, match=instance, season=instance.season, elo_score=winner_season_elo)
-        EloHistory.objects.create(player=loser, match=instance, season=instance.season, elo_score=loser_season_elo)
+        EloHistory.objects.create(
+            player=winner, match=instance,
+            season=instance.season, elo_score=winner_season_elo
+        )
+        EloHistory.objects.create(
+            player=loser, match=instance,
+            season=instance.season, elo_score=loser_season_elo
+        )
 
 
 @receiver(post_save, sender=Match)
