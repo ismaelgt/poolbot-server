@@ -5,7 +5,7 @@ from core.models import Match
 
 class MatchSerializer(serializers.ModelSerializer):
     """
-    Season is read_only for the external API, because we force it to
+    The `season` field is read only for the external API, because we force it to
     use the currently active season inside the MatchViewSet.perform_create()
     method.
 
