@@ -41,6 +41,7 @@ def recalculate_player_elo_ratings():
         match.loser.total_elo = elos[1]
         match.loser.save()
 
+
 def resync_player_match_counts():
     """Iterate over each player, count their win and loss count, then save this
     denormalized data onto the respective player instance.
