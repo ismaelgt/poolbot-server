@@ -37,7 +37,6 @@ def update_denormalized_player_fields(sender, instance=None, created=False, **kw
         winner.save()
 
         # update all denormalized fields on the loser
-        loser = instance.loser
         loser.total_elo = loser_total_elo
         loser.season_elo = loser_season_elo
         loser.increment_loss_counts(commit=False)

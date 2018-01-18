@@ -197,6 +197,7 @@ def season_player_migration():
                 loss_count=loss_count
             )
 
+
 def update_player_fields():
     """
     Hit the slack API to fetch all player details, and update any field
