@@ -23,11 +23,12 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 def update_denormalized_player_fields(sender, instance=None, created=False, **kwargs):
     """Update the ELO ratings and win/loss counts on the related player instances."""
     if created:
-        winner_total_elo, loser_total_elo = calculate_elo(instance.winner.total_elo, instance.loser.total_elo, 1)
-        winner_season_elo, loser_season_elo = calculate_elo(instance.winner.season_elo, instance.loser.season_elo, 1)
 
-        # update all denormalized fields on the winner
         winner = instance.winner
+        loser = instance.loser
+
+        winner_total_elo, loser_total_elo = calculate_elo(winner.total_elo, loser.total_elo)
+        winner_season_elo, loser_season_elo = calculate_elo(winner.season_elo, loser.season_elo)
         winner.total_elo = winner_total_elo
         winner.season_elo = winner_season_elo
         winner.increment_win_counts(commit=False)

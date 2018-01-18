@@ -77,8 +77,8 @@ class PlayerViewSet(TokenRequiredModelViewSet):
         player1_details = Player.objects.get(slack_id=player1)
         player2_details = Player.objects.get(slack_id=player2)
 
-        result1 = calculate_elo(player1_details.season_elo, player2_details.season_elo, 1)
-        result2 = calculate_elo(player2_details.season_elo, player1_details.season_elo, 1)
+        result1 = calculate_elo(player1_details.season_elo, player2_details.season_elo)
+        result2 = calculate_elo(player2_details.season_elo, player1_details.season_elo)
 
         def _generate_results(player_details, elo_win, elo_lose):
             return {
