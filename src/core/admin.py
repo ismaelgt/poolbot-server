@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Match
+from .models import Player, Season, Match
 
 
 class MatchAdmin(admin.ModelAdmin):
@@ -27,4 +27,6 @@ class MatchAdmin(admin.ModelAdmin):
     delete_and_updated_denormalized_selected.short_description = "Delete selected entries via delete()"
 
 
+admin.site.register(Player)
+admin.site.register(Season)
 admin.site.register(Match, MatchAdmin)

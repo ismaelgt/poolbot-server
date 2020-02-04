@@ -100,6 +100,11 @@ indexes:
 
 - kind: core_player
   properties:
+  - name: __key__
+    direction: desc
+
+- kind: core_player
+  properties:
   - name: active
   - name: elo
     direction: desc
