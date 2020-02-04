@@ -3,8 +3,8 @@ django>=1.7,<1.9
 django-secure
 git+https://github.com/mozilla/django-csp.git@f728d3af0b94a75ea9fb0bc88efbd74a45726000#egg=django-csp
 git+https://github.com/adamalton/django-csp-reports.git#egg=cspreports
-django-session-csrf
+django-session-csrf==0.6
 six
-djangorestframework
-django-filter
+djangorestframework==3.4.6
+django-filter==0.14.0
 decorator

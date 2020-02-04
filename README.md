@@ -8,10 +8,9 @@ First install all the dependencies:
 
 ```
   mkvirtualenv poolbot-server
-  pip install nodeenv
-  nodeenv -p --prebuilt
+  ./install_deps
   npm install
-  gulp  # transpiles JSX -> JS
+  gulp
   ./src/manage.py collectstatic
 ```
 
