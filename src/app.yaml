@@ -1,5 +1,3 @@
-application: potato-poolbot
-version: leaderboard
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -9,10 +7,6 @@ handlers:
 - url: /_ah/(mapreduce|queue|warmup|internalupload).*
   script: app.wsgi.application
   login: admin
-  secure: always
-
-- url: /static/admin/
-  static_dir: sitepackages/django/contrib/admin/static/admin/
   secure: always
 
 - url: /static/
